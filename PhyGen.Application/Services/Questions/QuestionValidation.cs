@@ -1,19 +1,18 @@
 ﻿using FluentValidation;
-using PhyGen.Domain.Questions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace PhyGen.Application.Services.Questions
 {
-    public class QuestionValidation : AbstractValidator<Question>
+    public class QuestionFileValidation : AbstractValidator<IFormFile>
     {
-        public QuestionValidation()
+        private readonly string[] allowedExtensions = { ".jpg", ".jpeg", ".png", ".pdf" };
+
+        public QuestionFileValidation()
         {
-            RuleFor(x => x.Id)
-            .NotEmpty();
+            RuleFor(file => file.FileName)
+                .NotEmpty()
+                .Must(fileName => allowedExtensions.Contains(Path.GetExtension(fileName).ToLower()))
+                .WithMessage($"Only these file formats are allowed: {string.Join(", ", allowedExtensions)}");
         }
     }
 }
