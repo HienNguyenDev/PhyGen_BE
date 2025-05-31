@@ -70,4 +70,4 @@ This project is licensed under the [MIT License](LICENSE).
 ## 🙋 Contact
 
 - **Author**: [HienNguyenDev](https://github.com/HienNguyenDev)
-- **Email**: [hiennguyendev@example.com](mailto:hiennguyendev@example.com)
+- **Email**: [nguyenhuuhien.dev@gmail.com](mailto:nguyenhuuhien.dev@gmail.com)
