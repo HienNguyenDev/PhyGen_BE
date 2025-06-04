@@ -5,14 +5,8 @@ services:
     build:
       context: .
       dockerfile: PhyGen.Api/Dockerfile
-  phygen-db:
-    image: postgres:latest
-    container_name: postgres
-    environment:
-      - POSTGRES_DB = PhyGen
-      - POSTGRES_USER = postgres
-      - POSTGRES_PASSWORD = postgres
-    volumes:
-      - ./.containers/database:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5152:8080"
+      - "7165:8081"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development

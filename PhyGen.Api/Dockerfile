@@ -13,9 +13,6 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["PhyGen.Api/PhyGen.Api.csproj", "PhyGen.Api/"]
-COPY ["PhyGen.Application/PhyGen.Application.csproj", "PhyGen.Application/"]
-COPY ["PhyGen.Domain/PhyGen.Domain.csproj", "PhyGen.Domain/"]
-COPY ["PhyGen.Infrastructure/PhyGen.Infrastructure.csproj", "PhyGen.Infrastructure/"]
 RUN dotnet restore "./PhyGen.Api/PhyGen.Api.csproj"
 COPY . .
 WORKDIR "/src/PhyGen.Api"
