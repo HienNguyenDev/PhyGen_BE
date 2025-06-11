@@ -14,12 +14,18 @@ namespace PhyGen.Infrastructure.Configurations
         public void Configure(EntityTypeBuilder<User> builder)
         {
             builder.HasKey(x => x.Id);
+            builder.Property(x => x.Id)
+                .IsRequired()
+                .ValueGeneratedNever(); 
 
             builder.Property(x => x.Username).IsRequired().HasMaxLength(255);
             builder.Property(x => x.Email).IsRequired().HasMaxLength(255);
             builder.Property(x => x.Password).IsRequired();
             builder.Property(x => x.Role).IsRequired().HasMaxLength(100);
             builder.Property(x => x.CreatedAt);
+
+            builder.HasIndex(x => x.Email).IsUnique();
+            builder.HasIndex(x => x.IdentityId).IsUnique();
         }
     }
 

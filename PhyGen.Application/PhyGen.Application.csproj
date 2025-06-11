@@ -21,8 +21,4 @@
     <ProjectReference Include="..\PhyGen.Domain\PhyGen.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Services\Users\" />
-  </ItemGroup>
-
 </Project>

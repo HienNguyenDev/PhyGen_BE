@@ -31,16 +31,6 @@ namespace PhyGen.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public async Task<bool> IsEmailUniqueAsync(string email)
-        {
-            return !await _dbSet.AnyAsync(u => u.Email == email);
-        }
-
-        public async Task<bool> IsUsernameUniqueAsync(string username)
-        {
-            return !await _dbSet.AnyAsync(u => u.Username == username);
-        }
-
         public async Task<List<User>> GetActiveUsersAsync()
         {
             return await _dbSet

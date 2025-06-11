@@ -15,10 +15,10 @@ namespace PhyGen.Domain.ExamSets
         public string Title { get; set; }
         public Guid ClassId { get; set; }
         public string Description { get; set; }
-        public int CreatedBy { get; set; }
+        public Guid CreatedBy { get; set; }
         public DateTime CreatedAt { get; set; }
         public string Status { get; set; }
-        public int? ReviewedBy { get; set; }
+        public Guid? ReviewedBy { get; set; }
         public DateTime? ReviewedAt { get; set; }
         public string ReviewNote { get; set; }
 

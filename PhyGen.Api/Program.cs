@@ -10,6 +10,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseSerilog((context, loggerConfig) => loggerConfig.ReadFrom.Configuration(context.Configuration));
 
+builder.Services.AddSwaggerGenWithAuth();
+
 builder.Services.AddApplication()
                 .AddPresentation()
                 .AddInfrastructure(builder.Configuration);
