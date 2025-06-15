@@ -8,11 +8,11 @@ namespace PhyGen.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AuthenticationController : ControllerBase
+    public class AuthController : ControllerBase
     {
         private readonly IUserServices _userService;
 
-        public AuthenticationController(IUserServices userService)
+        public AuthController(IUserServices userService)
         {
             _userService = userService;
         }
@@ -26,7 +26,7 @@ namespace PhyGen.Api.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<string> LoginUser(LoginDTO user, CancellationToken cancellationToken = default)
+        public async Task<TokenResponse> LoginUser(LoginDTO user, CancellationToken cancellationToken = default)
         {
             return await _userService.LoginUser(user, cancellationToken);
         }

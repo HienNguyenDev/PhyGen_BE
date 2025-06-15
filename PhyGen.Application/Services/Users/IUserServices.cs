@@ -22,7 +22,7 @@ namespace PhyGen.Application.Services.Users
             string? searchTerm = null);
         Task<Result> UpdateUser(User user, CancellationToken cancellationToken);
         Task<Result> InActiveUser(Guid userId, CancellationToken cancellationToken);
-        Task<string> LoginUser(LoginDTO loginDTO, CancellationToken cancellationToken);
+        Task<TokenResponse> LoginUser(LoginDTO loginDTO, CancellationToken cancellationToken);
     }
     
 }

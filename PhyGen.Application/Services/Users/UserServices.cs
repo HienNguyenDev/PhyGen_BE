@@ -37,6 +37,8 @@ namespace PhyGen.Application.Services.Users
                 Username = userDTO.UserName,
                 Email = userDTO.Email,
                 Password = userDTO.Password,
+                Role = UserRole.Customer,
+                CreatedAt = DateTime.UtcNow,
                 IdentityId = identityId,
             };
             await _userRepository.AddAsync(user);
@@ -109,10 +111,20 @@ namespace PhyGen.Application.Services.Users
             return Result.Success("User inactive successfully.");
         }
 
-        public async Task<string> LoginUser(LoginDTO loginDTO, CancellationToken cancellationToken)
+        public async Task<TokenResponse> LoginUser(LoginDTO loginDTO, CancellationToken cancellationToken)
         {
-            return await _jwtProvider.GetForCredentialsAsync(loginDTO.Email,
+            var token = await _jwtProvider.GetForCredentialsAsync(loginDTO.Email,
                 loginDTO.Password);
+            var user = await _userRepository.GetByEmailAsync(loginDTO.Email);
+            return new TokenResponse
+            {
+                AccessToken = token,
+                Id = user.Id,
+                Email = user.Email,
+                Username = user.Username,
+                Role = user.Role,
+                IdentityId = user.IdentityId
+            };
         }
     }
 }
