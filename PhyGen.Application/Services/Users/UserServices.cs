@@ -19,13 +19,15 @@ namespace PhyGen.Application.Services.Users
         private readonly IUnitOfWork _unitOfWork;
         private readonly IAuthenticationService _authenticationService;
         private readonly IJwtProvider _jwtProvider;
+        private readonly IPasswordHasher _passwordHasher;
 
-        public UserServices(IUserRepository userRepository, IUnitOfWork unitOfWork, IAuthenticationService authenticationService, IJwtProvider jwtProvider)
+        public UserServices(IUserRepository userRepository, IUnitOfWork unitOfWork, IAuthenticationService authenticationService, IJwtProvider jwtProvider, IPasswordHasher passwordHasher)
         {
             _userRepository = userRepository;
             _unitOfWork = unitOfWork;
             _authenticationService = authenticationService;
             _jwtProvider = jwtProvider;
+            _passwordHasher = passwordHasher;
         }
 
         public async Task<Result> CreateUser(UserDTO userDTO, CancellationToken cancellationToken)
@@ -36,7 +38,7 @@ namespace PhyGen.Application.Services.Users
                 Id = Guid.NewGuid(),
                 Username = userDTO.UserName,
                 Email = userDTO.Email,
-                Password = userDTO.Password,
+                Password = _passwordHasher.Hash(userDTO.Password),
                 Role = UserRole.Customer,
                 CreatedAt = DateTime.UtcNow,
                 IdentityId = identityId,
@@ -113,9 +115,9 @@ namespace PhyGen.Application.Services.Users
 
         public async Task<TokenResponse> LoginUser(LoginDTO loginDTO, CancellationToken cancellationToken)
         {
-            var token = await _jwtProvider.GetForCredentialsAsync(loginDTO.Email,
-                loginDTO.Password);
             var user = await _userRepository.GetByEmailAsync(loginDTO.Email);
+            var token = await _jwtProvider.GetForCredentialsAsync(loginDTO.Email,
+                loginDTO.Password, user.Password);
             return new TokenResponse
             {
                 AccessToken = token,

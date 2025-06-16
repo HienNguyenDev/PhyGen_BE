@@ -12,14 +12,21 @@ namespace PhyGen.Infrastructure.Authentication
     internal sealed class JwtProvider : IJwtProvider
     {
         private readonly HttpClient _httpClient;
+        private readonly IPasswordHasher _passwordHasher;
 
-        public JwtProvider(HttpClient httpClient)
+        public JwtProvider(HttpClient httpClient, IPasswordHasher passwordHasher)
         {
             _httpClient = httpClient;
+            _passwordHasher = passwordHasher;
         }
 
-        public async Task<string> GetForCredentialsAsync(string email, string password)
+        public async Task<string> GetForCredentialsAsync(string email, string password, string passwordHash)
         {
+            var passwordVerified = _passwordHasher.Verify(password, passwordHash);
+            if (passwordVerified == false)
+            {
+                throw new UnauthorizedAccessException("Invalid credentials provided.");
+            }
             var request = new
             {
                 email,

@@ -21,8 +21,9 @@ namespace PhyGen.Infrastructure.Configurations
             builder.Property(x => x.Username).IsRequired().HasMaxLength(255);
             builder.Property(x => x.Email).IsRequired().HasMaxLength(255);
             builder.Property(x => x.Password).IsRequired();
-            builder.Property(x => x.Role).IsRequired().HasMaxLength(100);
+            builder.Property(x => x.Role).IsRequired().HasConversion<int>(); ;
             builder.Property(x => x.CreatedAt);
+            builder.Property(x => x.Status).IsRequired().HasConversion<int>().HasDefaultValue(UserStatus.Active);
 
             builder.HasIndex(x => x.Email).IsUnique();
             builder.HasIndex(x => x.IdentityId).IsUnique();

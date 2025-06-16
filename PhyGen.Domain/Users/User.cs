@@ -14,6 +14,7 @@ namespace PhyGen.Domain.Users
         public string Email { get; set; }
         public string Password { get; set; }
         public string IdentityId { get; set; }
+        public bool IsProvider { get; set; } 
         public UserRole Role { get; set; }
         public UserStatus Status { get; set; }
         public DateTime CreatedAt { get; set; }

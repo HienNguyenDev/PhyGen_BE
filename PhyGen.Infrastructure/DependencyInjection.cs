@@ -75,6 +75,7 @@ namespace PhyGen.Infrastructure
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
+            services.AddScoped<IPasswordHasher, PasswordHasher>();
             return services;
         }
 

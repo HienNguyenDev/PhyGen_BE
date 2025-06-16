@@ -8,6 +8,6 @@ namespace PhyGen.Application.Abstractions.Authentication
 {
     public interface IJwtProvider
     {
-        Task<string> GetForCredentialsAsync(string email, string password);
+        Task<string> GetForCredentialsAsync(string email, string password, string passwordHash);
     }
 }
