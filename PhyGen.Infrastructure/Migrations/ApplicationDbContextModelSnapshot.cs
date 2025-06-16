@@ -107,12 +107,6 @@ namespace PhyGen.Infrastructure.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("UserId1")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ClassId");
@@ -120,10 +114,6 @@ namespace PhyGen.Infrastructure.Migrations
                     b.HasIndex("CreatedBy");
 
                     b.HasIndex("ReviewedBy");
-
-                    b.HasIndex("UserId");
-
-                    b.HasIndex("UserId1");
 
                     b.ToTable("ExamSets", "public");
                 });
@@ -285,16 +275,20 @@ namespace PhyGen.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<bool>("IsProvider")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("Role")
-                        .HasMaxLength(100)
                         .HasColumnType("integer");
 
                     b.Property<int>("Status")
-                        .HasColumnType("integer");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1);
 
                     b.Property<string>("Username")
                         .IsRequired()
@@ -332,22 +326,15 @@ namespace PhyGen.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("PhyGen.Domain.Users.User", "Creator")
-                        .WithMany()
+                        .WithMany("CreatedExamSets")
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("PhyGen.Domain.Users.User", "Reviewer")
-                        .WithMany()
-                        .HasForeignKey("ReviewedBy");
-
-                    b.HasOne("PhyGen.Domain.Users.User", null)
-                        .WithMany("CreatedExamSets")
-                        .HasForeignKey("UserId");
-
-                    b.HasOne("PhyGen.Domain.Users.User", null)
                         .WithMany("ReviewedExamSets")
-                        .HasForeignKey("UserId1");
+                        .HasForeignKey("ReviewedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Class");
 
