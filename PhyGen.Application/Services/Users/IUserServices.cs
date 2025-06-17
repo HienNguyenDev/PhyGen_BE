@@ -1,4 +1,6 @@
-﻿using PhyGen.Application.DTOs;
+﻿using PhyGen.Application.Common;
+using PhyGen.Application.DTOs.Authentication;
+using PhyGen.Application.DTOs.Users;
 using PhyGen.Domain.Common;
 using PhyGen.Domain.Users;
 using System;
@@ -11,18 +13,19 @@ namespace PhyGen.Application.Services.Users
 {
     public interface IUserServices
     {
-        Task<Result> CreateUser(UserDTO UserDTO, CancellationToken cancellationToken);
-        Task<Result<User>> GetByEmailAsync(string email);
-        Task<Result<User>> GetByUsernameAsync(string username);
-        Task<Result> GetUsersByRoleAsync(UserRole role);
-        Task<Page<User>> GetUsersPaginatedAsync(int pageNumber,
+        Task<ApiResult<User>> CreateUser(RegisterUserDTO userDTO, CancellationToken cancellationToken);
+        Task<ApiResult<User>> GetCurrentUser(CancellationToken cancellationToken);
+        Task<ApiResult<User>> GetByEmailOrUsernameAsync(string emailOrUsername);
+        Task<List<User>> GetUsersByRoleAsync(UserRole role);
+        Task<ApiResult<Page<User>>> GetUsersPaginatedAsync(
+            int pageNumber,
             int pageSize,
             UserRole? roleFilter = null,
             UserStatus? statusFilter = null,
             string? searchTerm = null);
-        Task<Result> UpdateUser(User user, CancellationToken cancellationToken);
-        Task<Result> InActiveUser(Guid userId, CancellationToken cancellationToken);
-        Task<TokenResponse> LoginUser(LoginDTO loginDTO, CancellationToken cancellationToken);
+        Task<ApiResult<string>> UpdateUser(Guid id, UpdateUserDTO updateUserDTO, CancellationToken cancellationToken);
+        Task<ApiResult<string>> InActiveUser(Guid userId, CancellationToken cancellationToken);
+        Task<ApiResult<TokenResponse>> LoginUser(LoginDTO loginDTO, CancellationToken cancellationToken);
     }
     
 }

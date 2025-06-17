@@ -9,10 +9,13 @@ using Microsoft.Extensions.DependencyInjection;
 using PhyGen.Application.Abstractions.Authentication;
 using PhyGen.Application.Abstractions.Data;
 using PhyGen.Application.Common.Interfaces;
+using PhyGen.Application.Services.Questions;
+using PhyGen.Domain.Common;
 using PhyGen.Infrastructure.Authentication;
 using PhyGen.Infrastructure.Database;
 using PhyGen.Infrastructure.Persistence;
 using PhyGen.Infrastructure.Repositories;
+using PhyGen.Infrastructure.Time;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,9 +31,11 @@ namespace PhyGen.Infrastructure
             .AddDatabase(configuration)
             .AddHealthChecks(configuration)
             .AddFirebase(configuration)
+            .AddSingleton(configuration)
             .AddScoped(configuration)
             .AddHTTPClient(configuration)
-            .AddAuth(configuration);
+            .AddAuth(configuration)
+            .AddHTTPContextAccessor();
 
         private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
         {
@@ -67,6 +72,7 @@ namespace PhyGen.Infrastructure
         private static IServiceCollection AddSingleton(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddSingleton<IAuthenticationService, AuthenticationService>();
+            services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
             return services;
         }
 
@@ -76,6 +82,8 @@ namespace PhyGen.Infrastructure
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IPasswordHasher, PasswordHasher>();
+            services.AddScoped<IUserContext, UserContext>();
+            services.AddScoped<IQuestionService, QuestionService>();
             return services;
         }
 
@@ -101,5 +109,10 @@ namespace PhyGen.Infrastructure
                     });
             return services;
         }
-    } 
+        private static IServiceCollection AddHTTPContextAccessor(this IServiceCollection services)
+        {
+            services.AddHttpContextAccessor();
+            return services;
+        }
+    }
 }   

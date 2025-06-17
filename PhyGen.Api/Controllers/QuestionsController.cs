@@ -19,10 +19,16 @@ public class QuestionsController : ControllerBase
     }
 
     [HttpPost("process-image")]
-    public async Task<IResult> ProcessImage(IFormFile file, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> ProcessImage(IFormFile file, CancellationToken cancellationToken = default)
     {
-        Result result = await _questionService.ProcessQuestionImage(file, cancellationToken);
+        var result = await _questionService.ProcessQuestionImageAsync(file, cancellationToken);
 
-        return result.MatchOk();
+        if (result.IsSuccess)
+        {
+            return Ok(result); 
+        }
+
+        return BadRequest(result); 
     }
+
 }

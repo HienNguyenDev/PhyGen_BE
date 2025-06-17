@@ -2,10 +2,11 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using PhyGen.Application.Abstractions.Data;
+using PhyGen.Application.Common;
 using PhyGen.Application.DTOs;
+using PhyGen.Application.DTOs.Questions;
 using PhyGen.Domain.Common;
 using PhyGen.Domain.Questions;
-using PhyGen.Domain.Questions.Errors;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -25,28 +26,36 @@ namespace PhyGen.Application.Services.Questions
 
         public QuestionService(
             IApplicationDbContext context)
-            //IAIService aiService,
-            //IFileService fileService,
-            //ICacheService cacheService)
+        //IAIService aiService,
+        //IFileService fileService,
+        //ICacheService cacheService)
         {
             _context = context;
             //_aiService = aiService;
             //_fileService = fileService;
             //_cacheService = cacheService;
         }
-        public async Task<Result> ProcessQuestionImage(IFormFile file, CancellationToken cancellationToken = default)
+        public async Task<ApiResult<QuestionDTO>> ProcessQuestionImageAsync(IFormFile file, CancellationToken cancellationToken = default)
         {
             string tempImagePath = null;
             string processedPath = null;
 
             try
             {
+                // 1. Validate input
+                if (file == null || file.Length == 0)
+                {
+                    return ApiResult<QuestionDTO>.Failure("No image file was provided.");
+                }
+
+                // 2. Save uploaded image temporarily
                 tempImagePath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.png");
                 await using (var fileStream = File.Create(tempImagePath))
                 {
                     await file.CopyToAsync(fileStream, cancellationToken);
                 }
 
+                // 3. Load image and preprocess
                 await using var inputStream = new FileStream(tempImagePath, FileMode.Open, FileAccess.Read, FileShare.Read);
                 using var memoryStream = new MemoryStream();
                 await inputStream.CopyToAsync(memoryStream, cancellationToken);
@@ -55,46 +64,45 @@ namespace PhyGen.Application.Services.Questions
                 using var originalImage = Image.FromStream(memoryStream);
                 using var processedImage = PreprocessImage(originalImage);
 
+                // 4. Save processed image temporarily
                 processedPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}_processed.png");
                 processedImage.Save(processedPath);
 
-                //Tesseract
+                // 5. Perform OCR using Tesseract
                 var tessDataPath = Path.Combine(AppContext.BaseDirectory, "tessdata");
 
                 string extractedText;
                 using (var engine = new TesseractEngine(tessDataPath, "vie", EngineMode.Default))
                 {
                     engine.SetVariable("preserve_interword_spaces", "1");
-
                     using var pix = Pix.LoadFromFile(processedPath);
                     using var page = engine.Process(pix);
                     extractedText = page.GetText().Trim();
                 }
 
-                var question = new Question
+                var questionDTO = new QuestionDTO
                 {
-                    QuestionText = extractedText,
+                    Text = extractedText
                 };
 
-                //await _context.Questions.AddAsync(question, cancellationToken);
-                //await _context.SaveChangesAsync(cancellationToken);
+                // 6. Optional: Save to DB if needed
+                // var question = new Question { QuestionText = extractedText };
+                // await _questionRepository.AddAsync(question);
+                // await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                return Result.Success(new QuestionDTO
-                {
-                    Text = question.QuestionText
-                });
+                return ApiResult<QuestionDTO>.Success(questionDTO, "Image processed and question extracted successfully.");
             }
             catch (OperationCanceledException)
             {
-                return Result.Failure(QuestionErrors.OperationCancelled);
+                return ApiResult<QuestionDTO>.Failure("The operation was canceled.");
             }
             catch (Exception ex)
             {
-                return Result.Failure(QuestionErrors.ExceptionError(ex));
+                return ApiResult<QuestionDTO>.Failure($"An error occurred while processing the image: {ex.Message}");
             }
             finally
             {
-                // 6. Cleanup temp files
+                // 7. Clean up temporary files
                 try
                 {
                     if (File.Exists(tempImagePath)) File.Delete(tempImagePath);
@@ -102,10 +110,12 @@ namespace PhyGen.Application.Services.Questions
                 }
                 catch
                 {
-                    // Không throw lỗi khi xoá file
+                    // Swallow any errors during cleanup
                 }
             }
         }
+
+
 
         private Bitmap PreprocessImage(Image image)
         {

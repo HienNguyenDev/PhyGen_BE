@@ -1,6 +1,6 @@
 using PhyGen.Domain.Questions;
 
-namespace PhyGen.Application.DTOs;
+namespace PhyGen.Application.DTOs.Questions;
 
 public class QuestionDTO
 {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PhyGen.Application.DTOs
+namespace PhyGen.Application.DTOs.Authentication
 {
     public class LoginDTO
     {

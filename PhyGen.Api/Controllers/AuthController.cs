@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PhyGen.Api.Extensions;
-using PhyGen.Application.DTOs;
+using PhyGen.Application.Common;
+using PhyGen.Application.DTOs.Authentication;
 using PhyGen.Application.Services.Users;
 using PhyGen.Domain.Common;
 
@@ -18,17 +20,29 @@ namespace PhyGen.Api.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IResult> RegisterUser(UserDTO user, CancellationToken cancellationToken = default)
+        public async Task<IResult> RegisterUser([FromBody] RegisterUserDTO user, CancellationToken cancellationToken)
         {
-            Result result = await _userService.CreateUser(user, cancellationToken);
+            var result = await _userService.CreateUser(user, cancellationToken);
 
-            return result.MatchOk();
+            if (result.IsSuccess && result.Data is not null)
+            {
+                return Results.Created($"/users/{result.Data.Id}", result); 
+            }
+
+            return Results.BadRequest(result); 
         }
 
         [HttpPost("login")]
-        public async Task<TokenResponse> LoginUser(LoginDTO user, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> LoginUser([FromBody] LoginDTO loginDTO, CancellationToken cancellationToken = default)
         {
-            return await _userService.LoginUser(user, cancellationToken);
+            var result = await _userService.LoginUser(loginDTO, cancellationToken);
+
+            if (!result.IsSuccess)
+            {
+                return Unauthorized(result); 
+            }
+
+            return Ok(result); 
         }
     }
 }
