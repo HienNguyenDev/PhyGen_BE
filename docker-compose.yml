@@ -16,8 +16,8 @@ services:
     image: phygenocr
     container_name: PhyGen.OCR
     build:
-      context: ../../phygen_api
-      dockerfile: phygen.api/Dockerfile
+      context: /home/ec2-user/phygen_api
+      dockerfile: Dockerfile
     ports:
       - "5153:8000"
     environment:
