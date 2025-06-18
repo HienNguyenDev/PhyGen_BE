@@ -12,7 +12,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
 
-  phygen.:
+  phygen.ocr:
     image: phygenocr
     container_name: PhyGen.OCR
     build:
