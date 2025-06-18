@@ -67,7 +67,7 @@ namespace PhyGen.Application.Services.Questions
                 content.Add(imageContent, "file", Path.GetFileName(tempImagePath));
 
                 // 4. Gửi ảnh sang Python OCR API
-                var response = await _httpClient.PostAsync("http://127.0.0.1:8000/ocr", content, cancellationToken);
+                var response = await _httpClient.PostAsync("http://ec2-54-66-6-158.ap-southeast-2.compute.amazonaws.com:5153/ocr/", content, cancellationToken);
                 response.EnsureSuccessStatusCode();
 
                 var json = await response.Content.ReadAsStringAsync(cancellationToken);
