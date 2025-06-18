@@ -37,10 +37,10 @@ namespace PhyGen.Api.Extensions
                     []
                 }
             };
-
                 o.AddSecurityRequirement(securityRequirement);
+                o.OperationFilter<FileUploadOperationFilter>();
             });
-
+            
             return services;
         }
     }

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using PhyGen.Application.Abstractions.Data;
 using PhyGen.Application.Common;
 using PhyGen.Application.DTOs;
+using PhyGen.Application.DTOs.OCR;
 using PhyGen.Application.DTOs.Questions;
 using PhyGen.Domain.Common;
 using PhyGen.Domain.Questions;
@@ -11,7 +12,9 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Tesseract;
 
@@ -20,127 +23,124 @@ namespace PhyGen.Application.Services.Questions
     public class QuestionService : IQuestionService
     {
         private readonly IApplicationDbContext _context;
+        private readonly HttpClient _httpClient;
         //private readonly IAIService _aiService;
         //private readonly IFileService _fileService;
         //private readonly ICacheService _cacheService;
 
         public QuestionService(
-            IApplicationDbContext context)
+            IApplicationDbContext context, HttpClient httpClient)
         //IAIService aiService,
         //IFileService fileService,
         //ICacheService cacheService)
         {
             _context = context;
+            _httpClient = httpClient;
             //_aiService = aiService;
             //_fileService = fileService;
             //_cacheService = cacheService;
         }
-        public async Task<ApiResult<QuestionDTO>> ProcessQuestionImageAsync(IFormFile file, CancellationToken cancellationToken = default)
+        public async Task<ApiResult<List<QuestionDTO>>> ProcessQuestionImageFromPythonAsync(IFormFile file, CancellationToken cancellationToken)
         {
             string tempImagePath = null;
-            string processedPath = null;
 
             try
             {
                 // 1. Validate input
                 if (file == null || file.Length == 0)
-                {
-                    return ApiResult<QuestionDTO>.Failure("No image file was provided.");
-                }
+                    return ApiResult<List<QuestionDTO>>.Failure("No image file was provided.");
 
                 // 2. Save uploaded image temporarily
-                tempImagePath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.png");
+                tempImagePath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}");
                 await using (var fileStream = File.Create(tempImagePath))
                 {
                     await file.CopyToAsync(fileStream, cancellationToken);
                 }
 
-                // 3. Load image and preprocess
-                await using var inputStream = new FileStream(tempImagePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                using var memoryStream = new MemoryStream();
-                await inputStream.CopyToAsync(memoryStream, cancellationToken);
-                memoryStream.Position = 0;
+                // 3. Prepare multipart/form-data
+                using var content = new MultipartFormDataContent();
+                await using var stream = new FileStream(tempImagePath, FileMode.Open, FileAccess.Read);
+                var imageContent = new StreamContent(stream);
+                imageContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType); // image/png or image/jpeg
 
-                using var originalImage = Image.FromStream(memoryStream);
-                using var processedImage = PreprocessImage(originalImage);
+                // 🟡 KEY phải là "file" để FastAPI nhận đúng
+                content.Add(imageContent, "file", Path.GetFileName(tempImagePath));
 
-                // 4. Save processed image temporarily
-                processedPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}_processed.png");
-                processedImage.Save(processedPath);
+                // 4. Gửi ảnh sang Python OCR API
+                var response = await _httpClient.PostAsync("http://127.0.0.1:8000/ocr", content, cancellationToken);
+                response.EnsureSuccessStatusCode();
 
-                // 5. Perform OCR using Tesseract
-                var tessDataPath = Path.Combine(AppContext.BaseDirectory, "tessdata");
+                var json = await response.Content.ReadAsStringAsync(cancellationToken);
 
-                string extractedText;
-                using (var engine = new TesseractEngine(tessDataPath, "vie", EngineMode.Default))
+                var ocrResult = JsonSerializer.Deserialize<OcrResponseDTO>(json, new JsonSerializerOptions
                 {
-                    engine.SetVariable("preserve_interword_spaces", "1");
-                    using var pix = Pix.LoadFromFile(processedPath);
-                    using var page = engine.Process(pix);
-                    extractedText = page.GetText().Trim();
-                }
+                    PropertyNameCaseInsensitive = true
+                });
 
-                var questionDTO = new QuestionDTO
+                if (ocrResult?.Questions == null || ocrResult.Questions.Count == 0)
+                    return ApiResult<List<QuestionDTO>>.Failure("OCR succeeded but no questions were detected.");
+
+                // 5. Map to DTO
+                var questions = ocrResult.Questions.Select(q => new QuestionDTO
                 {
-                    Text = extractedText
-                };
+                    Number = q.Number,
+                    Text = q.Question,
+                    A = q.A,
+                    B = q.B,
+                    C = q.C,
+                    D = q.D,
+                    Correct = q.Correct
+                }).ToList();
 
-                // 6. Optional: Save to DB if needed
-                // var question = new Question { QuestionText = extractedText };
-                // await _questionRepository.AddAsync(question);
-                // await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return ApiResult<QuestionDTO>.Success(questionDTO, "Image processed and question extracted successfully.");
+                return ApiResult<List<QuestionDTO>>.Success(questions, "Image processed and questions extracted successfully.");
             }
             catch (OperationCanceledException)
             {
-                return ApiResult<QuestionDTO>.Failure("The operation was canceled.");
+                return ApiResult<List<QuestionDTO>>.Failure("The operation was canceled.");
             }
             catch (Exception ex)
             {
-                return ApiResult<QuestionDTO>.Failure($"An error occurred while processing the image: {ex.Message}");
+                return ApiResult<List<QuestionDTO>>.Failure($"An error occurred: {ex.Message}");
             }
             finally
             {
-                // 7. Clean up temporary files
+                // 6. Cleanup temp file
                 try
                 {
-                    if (File.Exists(tempImagePath)) File.Delete(tempImagePath);
-                    if (File.Exists(processedPath)) File.Delete(processedPath);
+                    if (!string.IsNullOrEmpty(tempImagePath) && File.Exists(tempImagePath))
+                        File.Delete(tempImagePath);
                 }
-                catch
-                {
-                    // Swallow any errors during cleanup
-                }
+                catch { }
             }
         }
 
 
 
-        private Bitmap PreprocessImage(Image image)
-        {
-            var bitmap = new Bitmap(image);
 
-            // Convert to grayscale and increase contrast
-            for (int i = 0; i < bitmap.Width; i++)
-            {
-                for (int j = 0; j < bitmap.Height; j++)
-                {
-                    var pixel = bitmap.GetPixel(i, j);
-                    int gray = (int)((pixel.R * 0.3) + (pixel.G * 0.59) + (pixel.B * 0.11));
+        //private Bitmap PreprocessImage(Image image)
+        //{
+        //    var bitmap = new Bitmap(image);
 
-                    // Increase contrast
-                    if (gray > 127)
-                        gray = 255;
-                    else
-                        gray = 0;
+        //    // Convert to grayscale and increase contrast
+        //    for (int i = 0; i < bitmap.Width; i++)
+        //    {
+        //        for (int j = 0; j < bitmap.Height; j++)
+        //        {
+        //            var pixel = bitmap.GetPixel(i, j);
+        //            int gray = (int)((pixel.R * 0.3) + (pixel.G * 0.59) + (pixel.B * 0.11));
 
-                    bitmap.SetPixel(i, j, Color.FromArgb(pixel.A, gray, gray, gray));
-                }
-            }
+        //            // Increase contrast
+        //            if (gray > 127)
+        //                gray = 255;
+        //            else
+        //                gray = 0;
 
-            return bitmap;
-        }
+        //            bitmap.SetPixel(i, j, Color.FromArgb(pixel.A, gray, gray, gray));
+        //        }
+        //    }
+
+        //    return bitmap;
+        //}
 
         //public async Task<Result<QuestionAnalysisDto>> AnalyzeQuestion(Guid questionId, CancellationToken cancellationToken = default)
         //{

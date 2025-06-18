@@ -6,7 +6,7 @@ using PhyGen.Domain.Common;
 
 public interface IQuestionService
 {
-    Task<ApiResult<QuestionDTO>> ProcessQuestionImageAsync(IFormFile file, CancellationToken cancellationToken = default);
+    Task<ApiResult<List<QuestionDTO>>> ProcessQuestionImageFromPythonAsync(IFormFile file, CancellationToken cancellationToken);
     //Task<Result<QuestionAnalysisDto>> AnalyzeQuestion(int questionId, CancellationToken cancellationToken = default);
     //Task<Result<IEnumerable<QuestionDto>>> SearchQuestions(QuestionSearchRequest request, CancellationToken cancellationToken = default);
 }
