@@ -16,7 +16,7 @@ services:
     image: phygenocr
     container_name: PhyGen.OCR
     build:
-      context: .
+      context: ../../phygen_api
       dockerfile: phygen.api/Dockerfile
     ports:
       - "5153:8000"
