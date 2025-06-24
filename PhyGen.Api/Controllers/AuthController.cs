@@ -44,5 +44,24 @@ namespace PhyGen.Api.Controllers
 
             return Ok(result); 
         }
+
+        [HttpPost("login-with-google")]
+        public async Task<IActionResult> LoginWithGoogle(string uid, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var jwtToken = await _userService.LoginWithFirebaseUidAsync(uid, cancellationToken);
+                return Ok(jwtToken); 
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Login with Google failed: {ex.Message}");
+            }
+        }
+
     }
 }

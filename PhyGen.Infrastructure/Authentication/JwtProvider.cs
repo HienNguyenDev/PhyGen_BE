@@ -1,8 +1,14 @@
-﻿using PhyGen.Application.Abstractions.Authentication;
+﻿using FirebaseAdmin.Auth;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using PhyGen.Application.Abstractions.Authentication;
+using PhyGen.Domain.Users;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http.Json;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -13,32 +19,93 @@ namespace PhyGen.Infrastructure.Authentication
     {
         private readonly HttpClient _httpClient;
         private readonly IPasswordHasher _passwordHasher;
+        private readonly IConfiguration _configuration;
 
-        public JwtProvider(HttpClient httpClient, IPasswordHasher passwordHasher)
+        public JwtProvider(HttpClient httpClient, IPasswordHasher passwordHasher, IConfiguration configuration)
         {
             _httpClient = httpClient;
             _passwordHasher = passwordHasher;
+            _configuration = configuration;
         }
+
+        //public async Task<string> GetForCredentialsAsync(string email, string password, string passwordHash)
+        //{
+        //    var passwordVerified = _passwordHasher.Verify(password, passwordHash);
+        //    if (passwordVerified == false)
+        //    {
+        //        throw new UnauthorizedAccessException("Invalid credentials provided.");
+        //    }
+        //    var request = new
+        //    {
+        //        email,
+        //        password,
+        //        returnSecureToken = true
+        //    };
+
+        //    var response = await _httpClient.PostAsJsonAsync("", request);
+
+        //    var authToken = await response.Content.ReadFromJsonAsync<AuthToken>();
+
+        //    return authToken.IdToken;
+        //}
 
         public async Task<string> GetForCredentialsAsync(string email, string password, string passwordHash)
         {
             var passwordVerified = _passwordHasher.Verify(password, passwordHash);
-            if (passwordVerified == false)
+            if (!passwordVerified)
             {
                 throw new UnauthorizedAccessException("Invalid credentials provided.");
             }
-            var request = new
+
+            var role = "Customer"; 
+            var identityId = "";    
+
+            return (GenerateBackendJwt(email, role, identityId));
+        }
+
+        public async Task<string> GetFromGoogleIdTokenAsync(string firebaseIdToken)
+        {
+            var decodedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(firebaseIdToken);
+            var email = decodedToken.Claims["email"].ToString();
+            var identityId = decodedToken.Uid;
+            var role = "Customer"; 
+
+            return GenerateBackendJwt(email, role, identityId);
+        }
+
+        private string GenerateBackendJwt(string email, string role, string identityId)
+        {
+            var key = Encoding.UTF8.GetBytes(_configuration["Authentication:SecretKey"]);
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            var claims = new List<Claim>
             {
-                email,
-                password,
-                returnSecureToken = true
+                new Claim(ClaimTypes.Email, email),
+                new Claim(ClaimTypes.Role, role),
             };
 
-            var response = await _httpClient.PostAsJsonAsync("", request);
+            if (!string.IsNullOrWhiteSpace(identityId))
+            {
+                claims.Add(new Claim("IdentityId", identityId));
+            }
 
-            var authToken = await response.Content.ReadFromJsonAsync<AuthToken>();
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.UtcNow.AddDays(7),
+                SigningCredentials = new SigningCredentials(
+                    new SymmetricSecurityKey(key),
+                    SecurityAlgorithms.HmacSha256Signature)
+            };
 
-            return authToken.IdToken;
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+        }
+
+
+        public string GenerateBackendJwt(User user)
+        {
+            return GenerateBackendJwt(user.Email, user.Role.ToString(), user.IdentityId);
         }
 
         public class AuthToken

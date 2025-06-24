@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PhyGen.Domain.Users;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,5 +10,7 @@ namespace PhyGen.Application.Abstractions.Authentication
     public interface IJwtProvider
     {
         Task<string> GetForCredentialsAsync(string email, string password, string passwordHash);
+        Task<string> GetFromGoogleIdTokenAsync(string firebaseIdToken);
+        string GenerateBackendJwt(User user);
     }
 }

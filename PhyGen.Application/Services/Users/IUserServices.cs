@@ -26,6 +26,7 @@ namespace PhyGen.Application.Services.Users
         Task<ApiResult<string>> UpdateUser(Guid id, UpdateUserDTO updateUserDTO, CancellationToken cancellationToken);
         Task<ApiResult<string>> InActiveUser(Guid userId, CancellationToken cancellationToken);
         Task<ApiResult<TokenResponse>> LoginUser(LoginDTO loginDTO, CancellationToken cancellationToken);
+        Task<string> LoginWithFirebaseUidAsync(string uid, CancellationToken cancellationToken);
     }
     
 }

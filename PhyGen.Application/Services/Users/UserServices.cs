@@ -1,4 +1,5 @@
-﻿using PhyGen.Application.Abstractions.Authentication;
+﻿using FirebaseAdmin.Auth;
+using PhyGen.Application.Abstractions.Authentication;
 using PhyGen.Application.Common;
 using PhyGen.Application.Common.Interfaces;
 using PhyGen.Application.DTOs.Authentication;
@@ -252,5 +253,36 @@ namespace PhyGen.Application.Services.Users
             }
         }
 
+                        
+        public async Task<string> LoginWithFirebaseUidAsync(string uid, CancellationToken cancellationToken)
+        {
+            var userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);
+
+            string email = userRecord.Email;
+            string name = userRecord.DisplayName;
+            string identityId = userRecord.Uid;
+
+            var user = await _userRepository.GetByEmailAsync(email);
+            if (user == null)
+            {
+                user = new User
+                {
+                    Id = Guid.NewGuid(),
+                    Email = email,
+                    Username = name,
+                    Password = "abcd1234",
+                    Role = UserRole.Customer,
+                    Status = UserStatus.Active,
+                    CreatedAt = _dateTimeProvider.UtcNow,
+                    IdentityId = identityId,
+                    IsProvider = true,
+                };
+
+                await _userRepository.AddAsync(user);
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+            }
+
+            return _jwtProvider.GenerateBackendJwt(user);
+        }
     }
 }

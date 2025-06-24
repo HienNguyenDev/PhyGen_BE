@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using PhyGen.Application.Abstractions.Authentication;
 using PhyGen.Application.Abstractions.Data;
 using PhyGen.Application.Common.Interfaces;
@@ -100,15 +101,26 @@ namespace PhyGen.Infrastructure
 
         private static IServiceCollection AddAuth(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddAuthentication()
-                    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, jwtOptions =>
+            var secretKey = configuration["Authentication:SecretKey"];
+            var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
                     {
-                        jwtOptions.Authority = configuration["Authentication:ValidIssuer"];
-                        jwtOptions.Audience = configuration["Authentication:Audience"];
-                        jwtOptions.TokenValidationParameters.ValidIssuer = configuration["Authentication:ValidIssuer"];
-                    });
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = signingKey, 
+                    };
+                });
+
             return services;
         }
+
+
         private static IServiceCollection AddHTTPContextAccessor(this IServiceCollection services)
         {
             services.AddHttpContextAccessor();
