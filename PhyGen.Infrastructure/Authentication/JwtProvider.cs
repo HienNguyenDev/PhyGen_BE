@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using PhyGen.Application.Abstractions.Authentication;
+using PhyGen.Application.Common.Interfaces;
 using PhyGen.Domain.Users;
 using System;
 using System.Collections.Generic;
@@ -20,12 +21,14 @@ namespace PhyGen.Infrastructure.Authentication
         private readonly HttpClient _httpClient;
         private readonly IPasswordHasher _passwordHasher;
         private readonly IConfiguration _configuration;
+        private readonly IUserRepository _userRepository;
 
-        public JwtProvider(HttpClient httpClient, IPasswordHasher passwordHasher, IConfiguration configuration)
+        public JwtProvider(HttpClient httpClient, IPasswordHasher passwordHasher, IConfiguration configuration, IUserRepository userRepository)
         {
             _httpClient = httpClient;
             _passwordHasher = passwordHasher;
             _configuration = configuration;
+            _userRepository = userRepository;
         }
 
         //public async Task<string> GetForCredentialsAsync(string email, string password, string passwordHash)
@@ -56,24 +59,15 @@ namespace PhyGen.Infrastructure.Authentication
             {
                 throw new UnauthorizedAccessException("Invalid credentials provided.");
             }
-
+            var user = await _userRepository.GetByEmailAsync(email);
+            var id = user.Id;
             var role = "Customer"; 
             var identityId = "";    
 
-            return (GenerateBackendJwt(email, role, identityId));
+            return (GenerateBackendJwt(email, role, id, identityId));
         }
 
-        public async Task<string> GetFromGoogleIdTokenAsync(string firebaseIdToken)
-        {
-            var decodedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(firebaseIdToken);
-            var email = decodedToken.Claims["email"].ToString();
-            var identityId = decodedToken.Uid;
-            var role = "Customer"; 
-
-            return GenerateBackendJwt(email, role, identityId);
-        }
-
-        private string GenerateBackendJwt(string email, string role, string identityId)
+        private string GenerateBackendJwt(string email, string role, Guid id, string identityId)
         {
             var key = Encoding.UTF8.GetBytes(_configuration["Authentication:SecretKey"]);
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -82,6 +76,7 @@ namespace PhyGen.Infrastructure.Authentication
             {
                 new Claim(ClaimTypes.Email, email),
                 new Claim(ClaimTypes.Role, role),
+                new Claim(ClaimTypes.NameIdentifier, id.ToString())
             };
 
             if (!string.IsNullOrWhiteSpace(identityId))
@@ -105,7 +100,7 @@ namespace PhyGen.Infrastructure.Authentication
 
         public string GenerateBackendJwt(User user)
         {
-            return GenerateBackendJwt(user.Email, user.Role.ToString(), user.IdentityId);
+            return GenerateBackendJwt(user.Email, user.Role.ToString(), user.Id, user.IdentityId);
         }
 
         public class AuthToken

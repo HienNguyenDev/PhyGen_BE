@@ -10,7 +10,6 @@ namespace PhyGen.Application.Abstractions.Authentication
     public interface IJwtProvider
     {
         Task<string> GetForCredentialsAsync(string email, string password, string passwordHash);
-        Task<string> GetFromGoogleIdTokenAsync(string firebaseIdToken);
         string GenerateBackendJwt(User user);
     }
 }
