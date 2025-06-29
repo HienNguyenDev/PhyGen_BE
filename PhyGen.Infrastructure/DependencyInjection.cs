@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using PhyGen.Application.Abstractions.Authentication;
 using PhyGen.Application.Abstractions.Data;
 using PhyGen.Application.Common.Interfaces;
+using PhyGen.Application.Services.Firebase;
 using PhyGen.Application.Services.Questions;
 using PhyGen.Domain.Common;
 using PhyGen.Infrastructure.Authentication;
@@ -74,6 +75,7 @@ namespace PhyGen.Infrastructure
         {
             services.AddSingleton<IAuthenticationService, AuthenticationService>();
             services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+            services.AddSingleton<IFirebaseService, FirebaseService>();
             return services;
         }
 
