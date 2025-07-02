@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using PhyGen.Application.Common.Interfaces;
+using PhyGen.Application.Common.Interfaces.Repository;
 using PhyGen.Infrastructure.Database;
 using System.Linq.Expressions;
 

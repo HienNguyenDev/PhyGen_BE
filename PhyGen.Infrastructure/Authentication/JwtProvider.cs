@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using PhyGen.Application.Abstractions.Authentication;
-using PhyGen.Application.Common.Interfaces;
+using PhyGen.Application.Common.Interfaces.Repository;
 using PhyGen.Domain.Users;
 using System;
 using System.Collections.Generic;

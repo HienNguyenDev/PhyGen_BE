@@ -1,4 +1,5 @@
 using PhyGen.Application.Common.Interfaces;
+using PhyGen.Application.Common.Interfaces.Repository;
 using PhyGen.Infrastructure.Database;
 using System.Collections.Concurrent;
 

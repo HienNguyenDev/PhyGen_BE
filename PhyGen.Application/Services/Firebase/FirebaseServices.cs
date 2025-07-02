@@ -11,13 +11,13 @@ using Microsoft.Extensions.Configuration;
 
 namespace PhyGen.Application.Services.Firebase
 {
-    public class FirebaseService : IFirebaseService
+    public class FirebaseServices : IFirebaseServices
     {
         private readonly HttpClient _httpClient;
         private readonly string _databaseUrl;
         private readonly string _nodePath = "fcmTokens";
 
-        public FirebaseService(IConfiguration configuration)
+        public FirebaseServices(IConfiguration configuration)
         {
             _httpClient = new HttpClient();
             _databaseUrl = configuration["Firebase:DatabaseUrl"];

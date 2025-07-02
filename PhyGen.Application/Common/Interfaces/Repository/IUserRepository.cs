@@ -1,7 +1,7 @@
 using PhyGen.Domain.Common;
 using PhyGen.Domain.Users;
 
-namespace PhyGen.Application.Common.Interfaces
+namespace PhyGen.Application.Common.Interfaces.Repository
 {
     public interface IUserRepository : IGenericRepository<User>
     {

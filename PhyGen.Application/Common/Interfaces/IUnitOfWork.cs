@@ -1,3 +1,5 @@
+using PhyGen.Application.Common.Interfaces.Repository;
+
 namespace PhyGen.Application.Common.Interfaces;
 
 public interface IUnitOfWork : IDisposable

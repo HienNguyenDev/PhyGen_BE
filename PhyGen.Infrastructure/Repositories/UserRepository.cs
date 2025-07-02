@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PhyGen.Application.Common.Interfaces;
+using PhyGen.Application.Common.Interfaces.Repository;
 using PhyGen.Application.Extensions;
 using PhyGen.Domain.Common;
 using PhyGen.Domain.Users;

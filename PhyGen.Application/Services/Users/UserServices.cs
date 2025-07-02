@@ -2,6 +2,7 @@
 using PhyGen.Application.Abstractions.Authentication;
 using PhyGen.Application.Common;
 using PhyGen.Application.Common.Interfaces;
+using PhyGen.Application.Common.Interfaces.Repository;
 using PhyGen.Application.DTOs.Authentication;
 using PhyGen.Application.DTOs.Users;
 using PhyGen.Domain.Common;

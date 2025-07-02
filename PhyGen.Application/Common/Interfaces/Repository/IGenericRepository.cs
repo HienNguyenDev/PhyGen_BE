@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 
-namespace PhyGen.Application.Common.Interfaces;
+namespace PhyGen.Application.Common.Interfaces.Repository;
 
 public interface IGenericRepository<T> where T : class
 {

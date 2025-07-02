@@ -10,8 +10,13 @@ using Microsoft.IdentityModel.Tokens;
 using PhyGen.Application.Abstractions.Authentication;
 using PhyGen.Application.Abstractions.Data;
 using PhyGen.Application.Common.Interfaces;
+using PhyGen.Application.Common.Interfaces.Repository;
+using PhyGen.Application.Services.Classes;
+using PhyGen.Application.Services.ExamSets;
 using PhyGen.Application.Services.Firebase;
 using PhyGen.Application.Services.Questions;
+using PhyGen.Application.Services.Topics;
+using PhyGen.Application.Services.Users;
 using PhyGen.Domain.Common;
 using PhyGen.Infrastructure.Authentication;
 using PhyGen.Infrastructure.Database;
@@ -75,18 +80,33 @@ namespace PhyGen.Infrastructure
         {
             services.AddSingleton<IAuthenticationService, AuthenticationService>();
             services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
-            services.AddSingleton<IFirebaseService, FirebaseService>();
+            services.AddSingleton<IFirebaseServices, FirebaseServices>();
             return services;
         }
 
         private static IServiceCollection AddScoped(this IServiceCollection services, IConfiguration configuration)
         {
+            //Repositories
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<ITopicRepository, TopicRepository>();
+            services.AddScoped<IClassRepository, ClassRepository>();
+            services.AddScoped<IQuestionRepository, QuestionRepository>();
+            services.AddScoped<IExamSetRepository, ExamSetRepository>();
+
+            //Unit of Work
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            //Authentication
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IPasswordHasher, PasswordHasher>();
             services.AddScoped<IUserContext, UserContext>();
-            services.AddScoped<IQuestionService, QuestionService>();
+
+            //Serivces
+            services.AddScoped<IUserServices, UserServices>();
+            services.AddScoped<ITopicServices, TopicServices>();
+            services.AddScoped<IClassServices, ClassServices>();
+            services.AddScoped<IQuestionServices, QuestionServices>();
+            services.AddScoped<IExamSetServices, ExamSetServices>();
             return services;
         }
 

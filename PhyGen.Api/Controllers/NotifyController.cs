@@ -9,9 +9,9 @@ namespace PhyGen.Api.Controllers
     [Route("api/[controller]")]
     public class NotifyController : ControllerBase
     {
-        private readonly IFirebaseService _firebaseService;
+        private readonly IFirebaseServices _firebaseService;
 
-        public NotifyController(IFirebaseService firebaseService)
+        public NotifyController(IFirebaseServices firebaseService)
         {
             _firebaseService = firebaseService;
         }

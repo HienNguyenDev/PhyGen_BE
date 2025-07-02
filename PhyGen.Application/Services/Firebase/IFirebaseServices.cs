@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PhyGen.Application.Services.Firebase
 {
-    public interface IFirebaseService
+    public interface IFirebaseServices
     {
         Task<bool> SaveTokenToFirebaseAsync(string userId, string token);
         Task SendNotificationAsync(string title, string body, string fcmToken);

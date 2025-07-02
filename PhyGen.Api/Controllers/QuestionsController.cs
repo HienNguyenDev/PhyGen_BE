@@ -14,9 +14,9 @@ namespace PhyGen.Api.Controllers;
 [Route("api/[controller]")]
 public class QuestionsController : ControllerBase
 {
-    private readonly IQuestionService _questionService;
+    private readonly IQuestionServices _questionService;
 
-    public QuestionsController(IQuestionService questionService)
+    public QuestionsController(IQuestionServices questionService)
     {
         _questionService = questionService;
     }
@@ -50,4 +50,49 @@ public class QuestionsController : ControllerBase
         }
     }
 
+    [HttpGet]
+    public async Task<IActionResult> GetPaginated([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] Guid? classId = null, [FromQuery] Guid? chapterId = null, [FromQuery] string? searchTerm = null)
+    {
+        var result = await _questionService.GetPaginatedAsync(pageNumber, pageSize, classId, chapterId, searchTerm);
+        if (!result.IsSuccess)
+            return BadRequest(ApiResult<Page<Question>>.Failure(result.Message));
+        return Ok(ApiResult<Page<Question>>.Success(result.Data, result.Message));
+    }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(Guid id)
+    {
+        var result = await _questionService.GetByIdAsync(id);
+        if (!result.IsSuccess)
+            return BadRequest(ApiResult<Question>.Failure(result.Message));
+        return Ok(ApiResult<Question>.Success(result.Data, result.Message));
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Create([FromBody] Question question, CancellationToken cancellationToken)
+    {
+        var result = await _questionService.CreateAsync(question, cancellationToken);
+        if (!result.IsSuccess)
+            return BadRequest(ApiResult<Question>.Failure(result.Message));
+        return Ok(ApiResult<Question>.Success(result.Data, result.Message));
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(Guid id, [FromBody] Question question, CancellationToken cancellationToken)
+    {
+        question.Id = id;
+        var result = await _questionService.UpdateAsync(question, cancellationToken);
+        if (!result.IsSuccess)
+            return BadRequest(ApiResult<Question>.Failure(result.Message));
+        return Ok(ApiResult<Question>.Success(result.Data, result.Message));
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _questionService.DeleteAsync(id, cancellationToken);
+        if (!result.IsSuccess)
+            return BadRequest(ApiResult<bool>.Failure(result.Message));
+        return Ok(ApiResult<bool>.Success(result.Data, result.Message));
+    }
 }
