@@ -9,16 +9,16 @@ namespace PhyGen.Api.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
-    public class NotifyController : ControllerBase
+    public class NotificationTokensController : ControllerBase
     {
         private readonly IFirebaseServices _firebaseService;
 
-        public NotifyController(IFirebaseServices firebaseService)
+        public NotificationTokensController(IFirebaseServices firebaseService)
         {
             _firebaseService = firebaseService;
         }
 
-        [HttpPost("register-token")]
+        [HttpPost]
         public async Task<IActionResult> RegisterToken([FromBody] FcmTokenDTO dto)
         {
             try
