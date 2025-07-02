@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PhyGen.Api.Extensions;
 using PhyGen.Application.Common;
 using PhyGen.Application.DTOs;
@@ -12,6 +13,7 @@ namespace PhyGen.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class QuestionsController : ControllerBase
 {
     private readonly IQuestionServices _questionService;

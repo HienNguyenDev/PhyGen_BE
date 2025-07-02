@@ -14,6 +14,7 @@ namespace PhyGen.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class UsersController : ControllerBase
     {
         private readonly IUserServices _userService;
@@ -26,7 +27,6 @@ namespace PhyGen.Api.Controllers
         }
 
         [HttpGet("me")]
-        [Authorize]
         public async Task<IActionResult> GetCurrentUser(CancellationToken cancellationToken)
         {
             var result = await _userService.GetCurrentUser(cancellationToken);
@@ -34,15 +34,13 @@ namespace PhyGen.Api.Controllers
         }
 
         [HttpPut("{id:guid}")]
-        [Authorize]
         public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UpdateUserDTO updateUserDto, CancellationToken cancellationToken)
         {
             var message = await _userService.UpdateUser(id, updateUserDto, cancellationToken);
             return Ok(new { message });
         }
 
-        [HttpPatch("{id:guid}/inactivate")]
-        [Authorize]
+        [HttpPatch("{id:guid}/deactivate")]
         public async Task<IActionResult> InactivateUser(Guid id, CancellationToken cancellationToken)
         {
             var message = await _userService.InActiveUser(id, cancellationToken);
@@ -50,7 +48,6 @@ namespace PhyGen.Api.Controllers
         }
 
         [HttpGet]
-        [Authorize]
         public async Task<IActionResult> GetUsersPaginated(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10,
@@ -62,16 +59,14 @@ namespace PhyGen.Api.Controllers
             return Ok(pageResult);
         }
 
-        [HttpGet("get-user-by-email-or-username")]
-        [Authorize]
+        [HttpGet("by-identifier")]
         public async Task<IActionResult> GetUserByEmailOrUsername([FromQuery] string identifier)
         {
             var result = await _userService.GetByEmailOrUsernameAsync(identifier);
             return result.IsSuccess ? Ok(result) : NotFound(result);
         }
 
-        [HttpGet("get-user-by-role")]
-        [Authorize]
+        [HttpGet("by-role")]
         public async Task<IActionResult> GetUsersByRole([FromQuery] UserRole role)
         {
             try

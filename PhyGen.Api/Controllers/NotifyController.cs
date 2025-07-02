@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PhyGen.Application.Common;
 using PhyGen.Application.DTOs.FirebaseNotification;
 using PhyGen.Application.Services.Firebase;
@@ -7,6 +8,7 @@ namespace PhyGen.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class NotifyController : ControllerBase
     {
         private readonly IFirebaseServices _firebaseService;

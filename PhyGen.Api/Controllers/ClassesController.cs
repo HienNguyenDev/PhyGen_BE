@@ -7,11 +7,13 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using PhyGen.Domain.Common;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PhyGen.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class ClassesController : ControllerBase
     {
         private readonly IClassServices _classServices;

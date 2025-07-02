@@ -6,11 +6,13 @@ using PhyGen.Domain.Common;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PhyGen.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class ExamSetsController : ControllerBase
     {
         private readonly IExamSetServices _examSetServices;
