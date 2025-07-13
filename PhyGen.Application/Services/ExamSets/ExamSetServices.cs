@@ -30,7 +30,7 @@ namespace PhyGen.Application.Services.ExamSets
             return ApiResult<ExamSet>.Success(examSet, "ExamSet retrieved successfully");
         }
 
-        public async Task<ApiResult<Page<ExamSet>>> GetPaginatedAsync(int pageNumber, int pageSize, Guid? classId = null, Guid? createdBy = null, string? searchTerm = null)
+        public async Task<ApiResult<Page<ExamSet>>> GetPaginatedAsync(int pageNumber, int pageSize, int? classId = null, Guid? createdBy = null, string? searchTerm = null)
         {
             var page = await _examSetRepository.GetExamSetsPaginatedAsync(pageNumber, pageSize, classId, createdBy, searchTerm);
             return ApiResult<Page<ExamSet>>.Success(page, "ExamSets paginated successfully");

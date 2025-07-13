@@ -11,10 +11,10 @@ namespace PhyGen.Application.Services.Topics
 {
     public interface ITopicServices
     {
-        Task<ApiResult<Topic>> GetByIdAsync(Guid id);
-        Task<ApiResult<Page<Topic>>> GetPaginatedAsync(int pageNumber, int pageSize, Guid? chapterId = null, string? searchTerm = null);
+        Task<ApiResult<Topic>> GetByIdAsync(int id);
+        Task<ApiResult<Page<Topic>>> GetPaginatedAsync(int pageNumber, int pageSize, int? chapterId = null, string? searchTerm = null);
         Task<ApiResult<Topic>> CreateAsync(Topic topic, CancellationToken cancellationToken);
         Task<ApiResult<Topic>> UpdateAsync(Topic topic, CancellationToken cancellationToken);
-        Task<ApiResult<bool>> DeleteAsync(Guid id, CancellationToken cancellationToken);
+        Task<ApiResult<bool>> DeleteAsync(int id, CancellationToken cancellationToken);
     }
 }

@@ -24,7 +24,7 @@ namespace PhyGen.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(Guid id)
+        public async Task<IActionResult> GetById(int id)
         {
             var result = await _classServices.GetByIdAsync(id);
             if (!result.IsSuccess)
@@ -51,7 +51,7 @@ namespace PhyGen.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(Guid id, [FromBody] Class classEntity, CancellationToken cancellationToken)
+        public async Task<IActionResult> Update(int id, [FromBody] Class classEntity, CancellationToken cancellationToken)
         {
             classEntity.Id = id;
             var result = await _classServices.UpdateAsync(classEntity, cancellationToken);
@@ -61,7 +61,7 @@ namespace PhyGen.Api.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
+        public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
         {
             var result = await _classServices.DeleteAsync(id, cancellationToken);
             if (!result.IsSuccess)

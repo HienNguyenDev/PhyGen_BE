@@ -13,8 +13,8 @@ namespace PhyGen.Application.Common.Interfaces.Repository
         Task<Page<Question>> GetQuestionsPaginatedAsync(
             int pageNumber,
             int pageSize,
-            Guid? classId = null,
-            Guid? chapterId = null,
+            int? classId = null,
+            int? chapterId = null,
             string? searchTerm = null);
     }
 }

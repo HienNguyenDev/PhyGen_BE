@@ -122,7 +122,7 @@ namespace PhyGen.Application.Services.Questions
             return ApiResult<Question>.Success(question, "Question retrieved successfully");
         }
 
-        public async Task<ApiResult<Page<Question>>> GetPaginatedAsync(int pageNumber, int pageSize, Guid? classId = null, Guid? chapterId = null, string? searchTerm = null)
+        public async Task<ApiResult<Page<Question>>> GetPaginatedAsync(int pageNumber, int pageSize, int? classId = null, int? chapterId = null, string? searchTerm = null)
         {
             var page = await _questionRepository.GetQuestionsPaginatedAsync(pageNumber, pageSize, classId, chapterId, searchTerm);
             return ApiResult<Page<Question>>.Success(page, "Questions paginated successfully");

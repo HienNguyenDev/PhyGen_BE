@@ -20,9 +20,9 @@ public sealed class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<Class> Classes { get; set; }
     public DbSet<Chapter> Chapters { get; set; }
     public DbSet<Topic> Topics { get; set; }
-    public DbSet<QuestionType> QuestionTypes { get; set; }
     public DbSet<QuestionTemplate> QuestionTemplates { get; set; }
     public DbSet<Question> Questions { get; set; }
+    public DbSet<QuestionOptionSet> QuestionOptionSets { get; set; }
     public DbSet<ExamSet> ExamSets { get; set; }
     public DbSet<ExamSetQuestion> ExamSetQuestions { get; set; }
     public DbSet<User> Users { get; set; }

@@ -10,10 +10,9 @@ namespace PhyGen.Domain.Topics
 {
     public class Topic : Entity
     {
-        public Guid Id { get; set; }
-        public Guid ChapterId { get; set; }
-        public string Keyword { get; set; }
-        public string Synonyms { get; set; }
+        public int Id { get; set; }
+        public int ChapterId { get; set; }
+        public string TopicName { get; set; }
         public Chapter Chapter { get; set; }
     }
 

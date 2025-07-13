@@ -13,7 +13,6 @@ namespace PhyGen.Domain.ExamSets
         public Guid ExamSetId { get; set; }
         public Guid QuestionId { get; set; }
         public int Order { get; set; }
-
         public ExamSet ExamSet { get; set; }
         public Question Question { get; set; }
     }

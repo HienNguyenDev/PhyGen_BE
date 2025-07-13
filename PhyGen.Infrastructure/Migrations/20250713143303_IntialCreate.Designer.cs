@@ -12,7 +12,7 @@ using PhyGen.Infrastructure.Database;
 namespace PhyGen.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250610154800_IntialCreate")]
+    [Migration("20250713143303_IntialCreate")]
     partial class IntialCreate
     {
         /// <inheritdoc />
@@ -28,22 +28,19 @@ namespace PhyGen.Infrastructure.Migrations
 
             modelBuilder.Entity("PhyGen.Domain.Chapters.Chapter", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
 
-                    b.Property<string>("ChapterCode")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ChapterName")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<Guid>("ClassId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("ClassId")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -54,18 +51,16 @@ namespace PhyGen.Infrastructure.Migrations
 
             modelBuilder.Entity("PhyGen.Domain.Classes.Class", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ClassName")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -78,8 +73,8 @@ namespace PhyGen.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("ClassId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("ClassId")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -110,12 +105,6 @@ namespace PhyGen.Infrastructure.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("UserId1")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ClassId");
@@ -123,10 +112,6 @@ namespace PhyGen.Infrastructure.Migrations
                     b.HasIndex("CreatedBy");
 
                     b.HasIndex("ReviewedBy");
-
-                    b.HasIndex("UserId");
-
-                    b.HasIndex("UserId1");
 
                     b.ToTable("ExamSets", "public");
                 });
@@ -146,16 +131,11 @@ namespace PhyGen.Infrastructure.Migrations
                     b.Property<Guid>("QuestionId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("QuestionId1")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ExamSetId");
 
                     b.HasIndex("QuestionId");
-
-                    b.HasIndex("QuestionId1");
 
                     b.ToTable("ExamSetQuestions", "public");
                 });
@@ -166,29 +146,27 @@ namespace PhyGen.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<float>("AIConfidence")
-                        .HasColumnType("real");
+                    b.Property<int?>("ChapterId")
+                        .HasColumnType("integer");
 
-                    b.Property<Guid>("ChapterId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("ClassId")
-                        .HasColumnType("uuid");
+                    b.Property<int?>("ClassId")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("QuestionText")
+                    b.Property<int?>("Difficulty")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("QuestionContent")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("SourceFile")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<Guid>("TypeId")
+                    b.Property<Guid>("QuestionOptionSetId")
                         .HasColumnType("uuid");
+
+                    b.Property<int?>("TopicId")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -196,9 +174,50 @@ namespace PhyGen.Infrastructure.Migrations
 
                     b.HasIndex("ClassId");
 
-                    b.HasIndex("TypeId");
+                    b.HasIndex("TopicId");
 
                     b.ToTable("Questions", "public");
+                });
+
+            modelBuilder.Entity("PhyGen.Domain.Questions.QuestionOptionSet", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("A")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("B")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("C")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("Correct")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<string>("D")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<Guid>("QuestionId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuestionId")
+                        .IsUnique();
+
+                    b.ToTable("QuestionOptionSets", "public");
                 });
 
             modelBuilder.Entity("PhyGen.Domain.Questions.QuestionTemplate", b =>
@@ -207,62 +226,35 @@ namespace PhyGen.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("ChapterId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("ChapterId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("TemplateText")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("TypeId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ChapterId");
 
-                    b.HasIndex("TypeId");
-
                     b.ToTable("QuestionTemplates", "public");
-                });
-
-            modelBuilder.Entity("PhyGen.Domain.Questions.QuestionType", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Structure")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("TypeName")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("QuestionTypes", "public");
                 });
 
             modelBuilder.Entity("PhyGen.Domain.Topics.Topic", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
 
-                    b.Property<Guid>("ChapterId")
-                        .HasColumnType("uuid");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Keyword")
+                    b.Property<int>("ChapterId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TopicName")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
-
-                    b.Property<string>("Synonyms")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -288,12 +280,14 @@ namespace PhyGen.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<bool>("IsProvider")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("Role")
-                        .HasMaxLength(100)
                         .HasColumnType("integer");
 
                     b.Property<int>("Status")
@@ -335,22 +329,15 @@ namespace PhyGen.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("PhyGen.Domain.Users.User", "Creator")
-                        .WithMany()
+                        .WithMany("CreatedExamSets")
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("PhyGen.Domain.Users.User", "Reviewer")
-                        .WithMany()
-                        .HasForeignKey("ReviewedBy");
-
-                    b.HasOne("PhyGen.Domain.Users.User", null)
-                        .WithMany("CreatedExamSets")
-                        .HasForeignKey("UserId");
-
-                    b.HasOne("PhyGen.Domain.Users.User", null)
                         .WithMany("ReviewedExamSets")
-                        .HasForeignKey("UserId1");
+                        .HasForeignKey("ReviewedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Class");
 
@@ -368,14 +355,10 @@ namespace PhyGen.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("PhyGen.Domain.Questions.Question", "Question")
-                        .WithMany()
+                        .WithMany("ExamSetQuestions")
                         .HasForeignKey("QuestionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("PhyGen.Domain.Questions.Question", null)
-                        .WithMany("ExamSetQuestions")
-                        .HasForeignKey("QuestionId1");
 
                     b.Navigation("ExamSet");
 
@@ -387,26 +370,34 @@ namespace PhyGen.Infrastructure.Migrations
                     b.HasOne("PhyGen.Domain.Chapters.Chapter", "Chapter")
                         .WithMany("Questions")
                         .HasForeignKey("ChapterId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("PhyGen.Domain.Classes.Class", "Class")
                         .WithMany("Questions")
                         .HasForeignKey("ClassId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("PhyGen.Domain.Questions.QuestionType", "Type")
-                        .WithMany("Questions")
-                        .HasForeignKey("TypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("PhyGen.Domain.Topics.Topic", "Topic")
+                        .WithMany()
+                        .HasForeignKey("TopicId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Chapter");
 
                     b.Navigation("Class");
 
-                    b.Navigation("Type");
+                    b.Navigation("Topic");
+                });
+
+            modelBuilder.Entity("PhyGen.Domain.Questions.QuestionOptionSet", b =>
+                {
+                    b.HasOne("PhyGen.Domain.Questions.Question", "Question")
+                        .WithOne("QuestionOptionSet")
+                        .HasForeignKey("PhyGen.Domain.Questions.QuestionOptionSet", "QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Question");
                 });
 
             modelBuilder.Entity("PhyGen.Domain.Questions.QuestionTemplate", b =>
@@ -417,15 +408,7 @@ namespace PhyGen.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PhyGen.Domain.Questions.QuestionType", "Type")
-                        .WithMany("QuestionTemplates")
-                        .HasForeignKey("TypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Chapter");
-
-                    b.Navigation("Type");
                 });
 
             modelBuilder.Entity("PhyGen.Domain.Topics.Topic", b =>
@@ -465,13 +448,9 @@ namespace PhyGen.Infrastructure.Migrations
             modelBuilder.Entity("PhyGen.Domain.Questions.Question", b =>
                 {
                     b.Navigation("ExamSetQuestions");
-                });
 
-            modelBuilder.Entity("PhyGen.Domain.Questions.QuestionType", b =>
-                {
-                    b.Navigation("QuestionTemplates");
-
-                    b.Navigation("Questions");
+                    b.Navigation("QuestionOptionSet")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("PhyGen.Domain.Users.User", b =>

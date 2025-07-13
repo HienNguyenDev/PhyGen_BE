@@ -52,7 +52,7 @@ public class QuestionsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetPaginated([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] Guid? classId = null, [FromQuery] Guid? chapterId = null, [FromQuery] string? searchTerm = null)
+    public async Task<IActionResult> GetPaginated([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] int? classId = null, [FromQuery] int? chapterId = null, [FromQuery] string? searchTerm = null)
     {
         var result = await _questionService.GetPaginatedAsync(pageNumber, pageSize, classId, chapterId, searchTerm);
         if (!result.IsSuccess)

@@ -21,8 +21,8 @@ namespace PhyGen.Infrastructure.Repositories
         public async Task<Page<Question>> GetQuestionsPaginatedAsync(
             int pageNumber,
             int pageSize,
-            Guid? classId = null,
-            Guid? chapterId = null,
+            int? classId = null,
+            int? chapterId = null,
             string? searchTerm = null)
         {
             var query = _dbSet.AsQueryable();
@@ -31,7 +31,7 @@ namespace PhyGen.Infrastructure.Repositories
             if (chapterId.HasValue)
                 query = query.Where(q => q.ChapterId == chapterId);
             if (!string.IsNullOrEmpty(searchTerm))
-                query = query.Where(q => q.QuestionText.Contains(searchTerm));
+                query = query.Where(q => q.QuestionContent.Contains(searchTerm));
             int count = await query.CountAsync();
             var items = await query
                 .Skip((pageNumber - 1) * pageSize)

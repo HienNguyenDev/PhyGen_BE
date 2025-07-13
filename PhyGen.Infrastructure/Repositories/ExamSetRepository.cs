@@ -21,7 +21,7 @@ namespace PhyGen.Infrastructure.Repositories
         public async Task<Page<ExamSet>> GetExamSetsPaginatedAsync(
             int pageNumber,
             int pageSize,
-            Guid? classId = null,
+            int? classId = null,
             Guid? createdBy = null,
             string? searchTerm = null)
         {

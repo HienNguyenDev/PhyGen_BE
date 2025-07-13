@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
@@ -19,27 +20,13 @@ namespace PhyGen.Infrastructure.Migrations
                 schema: "public",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    ClassName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ClassName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Classes", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "QuestionTypes",
-                schema: "public",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    TypeName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Structure = table.Column<string>(type: "text", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_QuestionTypes", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -52,7 +39,8 @@ namespace PhyGen.Infrastructure.Migrations
                     Email = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     Password = table.Column<string>(type: "text", nullable: false),
                     IdentityId = table.Column<string>(type: "text", nullable: false),
-                    Role = table.Column<int>(type: "integer", maxLength: 100, nullable: false),
+                    IsProvider = table.Column<bool>(type: "boolean", nullable: false),
+                    Role = table.Column<int>(type: "integer", nullable: false),
                     Status = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
@@ -66,10 +54,10 @@ namespace PhyGen.Infrastructure.Migrations
                 schema: "public",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    ClassId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ChapterName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    ChapterCode = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ClassId = table.Column<int>(type: "integer", nullable: false),
+                    ChapterName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -90,16 +78,14 @@ namespace PhyGen.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Title = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    ClassId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ClassId = table.Column<int>(type: "integer", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Status = table.Column<string>(type: "text", nullable: false),
                     ReviewedBy = table.Column<Guid>(type: "uuid", nullable: true),
                     ReviewedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    ReviewNote = table.Column<string>(type: "text", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: true),
-                    UserId1 = table.Column<Guid>(type: "uuid", nullable: true)
+                    ReviewNote = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -117,65 +103,14 @@ namespace PhyGen.Infrastructure.Migrations
                         principalSchema: "public",
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_ExamSets_Users_ReviewedBy",
                         column: x => x.ReviewedBy,
                         principalSchema: "public",
                         principalTable: "Users",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_ExamSets_Users_UserId",
-                        column: x => x.UserId,
-                        principalSchema: "public",
-                        principalTable: "Users",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_ExamSets_Users_UserId1",
-                        column: x => x.UserId1,
-                        principalSchema: "public",
-                        principalTable: "Users",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Questions",
-                schema: "public",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    QuestionText = table.Column<string>(type: "text", nullable: false),
-                    ClassId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ChapterId = table.Column<Guid>(type: "uuid", nullable: false),
-                    TypeId = table.Column<Guid>(type: "uuid", nullable: false),
-                    SourceFile = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    AIConfidence = table.Column<float>(type: "real", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Questions", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Questions_Chapters_ChapterId",
-                        column: x => x.ChapterId,
-                        principalSchema: "public",
-                        principalTable: "Chapters",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Questions_Classes_ClassId",
-                        column: x => x.ClassId,
-                        principalSchema: "public",
-                        principalTable: "Classes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Questions_QuestionTypes_TypeId",
-                        column: x => x.TypeId,
-                        principalSchema: "public",
-                        principalTable: "QuestionTypes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -184,8 +119,7 @@ namespace PhyGen.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    ChapterId = table.Column<Guid>(type: "uuid", nullable: false),
-                    TypeId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ChapterId = table.Column<int>(type: "integer", nullable: false),
                     TemplateText = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
@@ -198,13 +132,6 @@ namespace PhyGen.Infrastructure.Migrations
                         principalTable: "Chapters",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_QuestionTemplates_QuestionTypes_TypeId",
-                        column: x => x.TypeId,
-                        principalSchema: "public",
-                        principalTable: "QuestionTypes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -212,10 +139,10 @@ namespace PhyGen.Infrastructure.Migrations
                 schema: "public",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    ChapterId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Keyword = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Synonyms = table.Column<string>(type: "text", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ChapterId = table.Column<int>(type: "integer", nullable: false),
+                    TopicName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -230,6 +157,46 @@ namespace PhyGen.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Questions",
+                schema: "public",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    QuestionOptionSetId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ClassId = table.Column<int>(type: "integer", nullable: true),
+                    ChapterId = table.Column<int>(type: "integer", nullable: true),
+                    TopicId = table.Column<int>(type: "integer", nullable: true),
+                    QuestionContent = table.Column<string>(type: "text", nullable: false),
+                    Difficulty = table.Column<int>(type: "integer", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Questions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Questions_Chapters_ChapterId",
+                        column: x => x.ChapterId,
+                        principalSchema: "public",
+                        principalTable: "Chapters",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_Questions_Classes_ClassId",
+                        column: x => x.ClassId,
+                        principalSchema: "public",
+                        principalTable: "Classes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_Questions_Topics_TopicId",
+                        column: x => x.TopicId,
+                        principalSchema: "public",
+                        principalTable: "Topics",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ExamSetQuestions",
                 schema: "public",
                 columns: table => new
@@ -237,8 +204,7 @@ namespace PhyGen.Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     ExamSetId = table.Column<Guid>(type: "uuid", nullable: false),
                     QuestionId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Order = table.Column<int>(type: "integer", nullable: false),
-                    QuestionId1 = table.Column<Guid>(type: "uuid", nullable: true)
+                    Order = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -257,12 +223,31 @@ namespace PhyGen.Infrastructure.Migrations
                         principalTable: "Questions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "QuestionOptionSets",
+                schema: "public",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    QuestionId = table.Column<Guid>(type: "uuid", nullable: false),
+                    A = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    B = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    C = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    D = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Correct = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_QuestionOptionSets", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ExamSetQuestions_Questions_QuestionId1",
-                        column: x => x.QuestionId1,
+                        name: "FK_QuestionOptionSets_Questions_QuestionId",
+                        column: x => x.QuestionId,
                         principalSchema: "public",
                         principalTable: "Questions",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -284,12 +269,6 @@ namespace PhyGen.Infrastructure.Migrations
                 column: "QuestionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ExamSetQuestions_QuestionId1",
-                schema: "public",
-                table: "ExamSetQuestions",
-                column: "QuestionId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ExamSets_ClassId",
                 schema: "public",
                 table: "ExamSets",
@@ -308,16 +287,11 @@ namespace PhyGen.Infrastructure.Migrations
                 column: "ReviewedBy");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ExamSets_UserId",
+                name: "IX_QuestionOptionSets_QuestionId",
                 schema: "public",
-                table: "ExamSets",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ExamSets_UserId1",
-                schema: "public",
-                table: "ExamSets",
-                column: "UserId1");
+                table: "QuestionOptionSets",
+                column: "QuestionId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Questions_ChapterId",
@@ -332,22 +306,16 @@ namespace PhyGen.Infrastructure.Migrations
                 column: "ClassId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Questions_TypeId",
+                name: "IX_Questions_TopicId",
                 schema: "public",
                 table: "Questions",
-                column: "TypeId");
+                column: "TopicId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_QuestionTemplates_ChapterId",
                 schema: "public",
                 table: "QuestionTemplates",
                 column: "ChapterId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_QuestionTemplates_TypeId",
-                schema: "public",
-                table: "QuestionTemplates",
-                column: "TypeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Topics_ChapterId",
@@ -378,11 +346,11 @@ namespace PhyGen.Infrastructure.Migrations
                 schema: "public");
 
             migrationBuilder.DropTable(
-                name: "QuestionTemplates",
+                name: "QuestionOptionSets",
                 schema: "public");
 
             migrationBuilder.DropTable(
-                name: "Topics",
+                name: "QuestionTemplates",
                 schema: "public");
 
             migrationBuilder.DropTable(
@@ -398,11 +366,11 @@ namespace PhyGen.Infrastructure.Migrations
                 schema: "public");
 
             migrationBuilder.DropTable(
-                name: "Chapters",
+                name: "Topics",
                 schema: "public");
 
             migrationBuilder.DropTable(
-                name: "QuestionTypes",
+                name: "Chapters",
                 schema: "public");
 
             migrationBuilder.DropTable(

@@ -20,7 +20,7 @@ namespace PhyGen.Application.Services.Topics
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<ApiResult<Topic>> GetByIdAsync(Guid id)
+        public async Task<ApiResult<Topic>> GetByIdAsync(int id)
         {
             try
             {
@@ -32,7 +32,7 @@ namespace PhyGen.Application.Services.Topics
             }
         }
 
-        public async Task<ApiResult<Page<Topic>>> GetPaginatedAsync(int pageNumber, int pageSize, Guid? chapterId = null, string? searchTerm = null)
+        public async Task<ApiResult<Page<Topic>>> GetPaginatedAsync(int pageNumber, int pageSize, int? chapterId = null, string? searchTerm = null)
         {
             var page = await _topicRepository.GetTopicsPaginatedAsync(pageNumber, pageSize, chapterId, searchTerm);
             return ApiResult<Page<Topic>>.Success(page, "Topics paginated successfully");
@@ -52,7 +52,7 @@ namespace PhyGen.Application.Services.Topics
             return ApiResult<Topic>.Success(topic, "Topic updated successfully");
         }
 
-        public async Task<ApiResult<bool>> DeleteAsync(Guid id, CancellationToken cancellationToken)
+        public async Task<ApiResult<bool>> DeleteAsync(int id, CancellationToken cancellationToken)
         {
             var topic = await _topicRepository.GetByIdAsync(id);
             if (topic == null)

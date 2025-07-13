@@ -13,7 +13,7 @@ public interface IApplicationDbContext
     DbSet<Class> Classes { get; set; }
     DbSet<Chapter> Chapters { get; set; }
     DbSet<Topic> Topics { get; set; }
-    DbSet<QuestionType> QuestionTypes { get; set; }
+    DbSet<QuestionOptionSet> QuestionOptionSets { get; set; }
     DbSet<QuestionTemplate> QuestionTemplates { get; set; }
     DbSet<Question> Questions { get; set; }
     DbSet<ExamSet> ExamSets { get; set; }

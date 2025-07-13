@@ -22,14 +22,14 @@ namespace PhyGen.Infrastructure.Repositories
         public async Task<Page<Topic>> GetTopicsPaginatedAsync(
             int pageNumber,
             int pageSize,
-            Guid? chapterId = null,
+            int? chapterId = null,
             string? searchTerm = null)
         {
             var query = _dbSet.AsQueryable();
             if (chapterId.HasValue)
                 query = query.Where(t => t.ChapterId == chapterId);
             if (!string.IsNullOrEmpty(searchTerm))
-                query = query.Where(t => t.Keyword.Contains(searchTerm) || t.Synonyms.Contains(searchTerm));
+                query = query.Where(t => t.TopicName.Contains(searchTerm));
             int count = await query.CountAsync();
             var items = await query
                 .Skip((pageNumber - 1) * pageSize)

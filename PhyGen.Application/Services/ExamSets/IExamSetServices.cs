@@ -12,7 +12,7 @@ namespace PhyGen.Application.Services.ExamSets
     public interface IExamSetServices
     {
         Task<ApiResult<ExamSet>> GetByIdAsync(Guid id);
-        Task<ApiResult<Page<ExamSet>>> GetPaginatedAsync(int pageNumber, int pageSize, Guid? classId = null, Guid? createdBy = null, string? searchTerm = null);
+        Task<ApiResult<Page<ExamSet>>> GetPaginatedAsync(int pageNumber, int pageSize, int? classId = null, Guid? createdBy = null, string? searchTerm = null);
         Task<ApiResult<ExamSet>> CreateAsync(ExamSet examSet, CancellationToken cancellationToken);
         Task<ApiResult<ExamSet>> UpdateAsync(ExamSet examSet, CancellationToken cancellationToken);
         Task<ApiResult<bool>> DeleteAsync(Guid id, CancellationToken cancellationToken);

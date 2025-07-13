@@ -20,7 +20,7 @@ namespace PhyGen.Application.Services.Classes
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<ApiResult<Class>> GetByIdAsync(Guid id)
+        public async Task<ApiResult<Class>> GetByIdAsync(int id)
         {
             var result = await _classRepository.GetByIdAsync(id);
             return result != null 
@@ -48,7 +48,7 @@ namespace PhyGen.Application.Services.Classes
             return ApiResult<Class>.Success(classEntity, "Class updated successfully");
         }
 
-        public async Task<ApiResult<bool>> DeleteAsync(Guid id, CancellationToken cancellationToken)
+        public async Task<ApiResult<bool>> DeleteAsync(int id, CancellationToken cancellationToken)
         {
             var classEntity = await _classRepository.GetByIdAsync(id);
             if (classEntity == null)

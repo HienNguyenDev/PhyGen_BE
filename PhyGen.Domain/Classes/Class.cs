@@ -12,10 +12,8 @@ namespace PhyGen.Domain.Classes
 {
     public class Class : Entity
     {
-        public Guid Id { get; set; }
+        public int Id { get; set; }
         public string ClassName { get; set; }
-        public string Description { get; set; }
-
         public ICollection<Chapter> Chapters { get; set; }
         public ICollection<Question> Questions { get; set; }
         public ICollection<ExamSet> ExamSets { get; set; }

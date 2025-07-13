@@ -25,7 +25,7 @@ namespace PhyGen.Infrastructure.Repositories
         {
             var query = _dbSet.AsQueryable();
             if (!string.IsNullOrEmpty(searchTerm))
-                query = query.Where(c => c.ClassName.Contains(searchTerm) || c.Description.Contains(searchTerm));
+                query = query.Where(c => c.ClassName.Contains(searchTerm));
             int count = await query.CountAsync();
             var items = await query
                 .Skip((pageNumber - 1) * pageSize)

@@ -24,7 +24,7 @@ namespace PhyGen.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(Guid id)
+        public async Task<IActionResult> GetById(int id)
         {
             var result = await _topicServices.GetByIdAsync(id);
             if (!result.IsSuccess)
@@ -33,7 +33,7 @@ namespace PhyGen.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetPaginated([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] Guid? chapterId = null, [FromQuery] string? searchTerm = null)
+        public async Task<IActionResult> GetPaginated([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] int? chapterId = null, [FromQuery] string? searchTerm = null)
         {
             var result = await _topicServices.GetPaginatedAsync(pageNumber, pageSize, chapterId, searchTerm);
             if (!result.IsSuccess)
@@ -51,7 +51,7 @@ namespace PhyGen.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(Guid id, [FromBody] Topic topic, CancellationToken cancellationToken)
+        public async Task<IActionResult> Update(int id, [FromBody] Topic topic, CancellationToken cancellationToken)
         {
             topic.Id = id;
             var result = await _topicServices.UpdateAsync(topic, cancellationToken);
@@ -61,7 +61,7 @@ namespace PhyGen.Api.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
+        public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
         {
             var result = await _topicServices.DeleteAsync(id, cancellationToken);
             if (!result.IsSuccess)

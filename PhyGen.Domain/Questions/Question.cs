@@ -2,6 +2,7 @@
 using PhyGen.Domain.Classes;
 using PhyGen.Domain.Common;
 using PhyGen.Domain.ExamSets;
+using PhyGen.Domain.Topics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,18 +14,17 @@ namespace PhyGen.Domain.Questions
     public class Question : Entity
     {
         public Guid Id { get; set; }
-        public string QuestionText { get; set; }
-        public Guid ClassId { get; set; }
-        public Guid ChapterId { get; set; }
-        public Guid TypeId { get; set; }
-        public string SourceFile { get; set; }
+        public Guid QuestionOptionSetId { get; set; }
+        public int? ClassId { get; set; }
+        public int? ChapterId { get; set; }
+        public int? TopicId { get; set; }
+        public string QuestionContent { get; set; }
+        public int? Difficulty { get; set; }
         public DateTime CreatedAt { get; set; }
-        public float AIConfidence { get; set; }
-
         public Class Class { get; set; }
         public Chapter Chapter { get; set; }
-        public QuestionType Type { get; set; }
+        public Topic Topic { get; set; }
+        public QuestionOptionSet QuestionOptionSet { get; set; }
         public ICollection<ExamSetQuestion> ExamSetQuestions { get; set; }
     }
-
 }

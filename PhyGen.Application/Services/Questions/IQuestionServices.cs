@@ -11,7 +11,7 @@ public interface IQuestionServices
     //Task<Result<QuestionAnalysisDto>> AnalyzeQuestion(int questionId, CancellationToken cancellationToken = default);
     //Task<Result<IEnumerable<QuestionDto>>> SearchQuestions(QuestionSearchRequest request, CancellationToken cancellationToken = default);
     Task<ApiResult<Question>> GetByIdAsync(Guid id);
-    Task<ApiResult<Page<Question>>> GetPaginatedAsync(int pageNumber, int pageSize, Guid? classId = null, Guid? chapterId = null, string? searchTerm = null);
+    Task<ApiResult<Page<Question>>> GetPaginatedAsync(int pageNumber, int pageSize, int? classId = null, int? chapterId = null, string? searchTerm = null);
     Task<ApiResult<Question>> CreateAsync(Question question, CancellationToken cancellationToken);
     Task<ApiResult<Question>> UpdateAsync(Question question, CancellationToken cancellationToken);
     Task<ApiResult<bool>> DeleteAsync(Guid id, CancellationToken cancellationToken);

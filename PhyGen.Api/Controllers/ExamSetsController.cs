@@ -32,7 +32,7 @@ namespace PhyGen.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetPaginated([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] Guid? classId = null, [FromQuery] Guid? createdBy = null, [FromQuery] string? searchTerm = null)
+        public async Task<IActionResult> GetPaginated([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] int? classId = null, [FromQuery] Guid? createdBy = null, [FromQuery] string? searchTerm = null)
         {
             var result = await _examSetServices.GetPaginatedAsync(pageNumber, pageSize, classId, createdBy, searchTerm);
             if (!result.IsSuccess)

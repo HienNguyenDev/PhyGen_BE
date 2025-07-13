@@ -1,11 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
 using PhyGen.Domain.Chapters;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PhyGen.Infrastructure.Configurations
 {
@@ -14,14 +9,27 @@ namespace PhyGen.Infrastructure.Configurations
         public void Configure(EntityTypeBuilder<Chapter> builder)
         {
             builder.HasKey(x => x.Id);
-
-            builder.Property(x => x.ChapterName).HasMaxLength(255);
-            builder.Property(x => x.ChapterCode).HasMaxLength(100);
+            builder.Property(x => x.ChapterName).IsRequired().HasMaxLength(255);
 
             builder.HasOne(x => x.Class)
                    .WithMany(x => x.Chapters)
-                   .HasForeignKey(x => x.ClassId);
+                   .HasForeignKey(x => x.ClassId)
+                   .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasMany(x => x.Topics)
+                   .WithOne(x => x.Chapter)
+                   .HasForeignKey(x => x.ChapterId)
+                   .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasMany(x => x.Questions)
+                   .WithOne(x => x.Chapter)
+                   .HasForeignKey(x => x.ChapterId)
+                   .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasMany(x => x.QuestionTemplates)
+                   .WithOne(x => x.Chapter)
+                   .HasForeignKey(x => x.ChapterId)
+                   .OnDelete(DeleteBehavior.Cascade);
         }
     }
-
 }

@@ -13,7 +13,7 @@ namespace PhyGen.Application.Common.Interfaces.Repository
         Task<Page<Topic>> GetTopicsPaginatedAsync(
             int pageNumber,
             int pageSize,
-            Guid? chapterId = null,
+            int? chapterId = null,
             string? searchTerm = null);
     }
 }

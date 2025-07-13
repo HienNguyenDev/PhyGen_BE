@@ -1,11 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
 using PhyGen.Domain.Classes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PhyGen.Infrastructure.Configurations
 {
@@ -14,13 +9,23 @@ namespace PhyGen.Infrastructure.Configurations
         public void Configure(EntityTypeBuilder<Class> builder)
         {
             builder.HasKey(x => x.Id);
-
-            builder.Property(x => x.ClassName).HasMaxLength(255);
-            builder.Property(x => x.Description).HasColumnType("text");
+            builder.Property(x => x.ClassName).IsRequired().HasMaxLength(255);
 
             builder.HasMany(x => x.Chapters)
                    .WithOne(x => x.Class)
-                   .HasForeignKey(x => x.ClassId);
+                   .HasForeignKey(x => x.ClassId)
+                   .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasMany(x => x.Questions)
+                   .WithOne(x => x.Class)
+                   .HasForeignKey(x => x.ClassId)
+                   .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasMany(x => x.ExamSets)
+                   .WithOne(x => x.Class)
+                   .HasForeignKey(x => x.ClassId)
+                   .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
+
