@@ -41,6 +41,7 @@ namespace PhyGen.Application.Services.Questions
         public async Task<ApiResult<List<QuestionDTO>>> ProcessQuestionImageFromPythonAsync(IFormFile file, CancellationToken cancellationToken)
         {
             string tempImagePath = null;
+            string url = "http://20.255.189.211:8000/question/label-data";
 
             try
             {
@@ -65,7 +66,7 @@ namespace PhyGen.Application.Services.Questions
                 content.Add(imageContent, "file", Path.GetFileName(tempImagePath));
 
                 // 4. Gửi ảnh sang Python OCR API
-                var response = await _httpClient.PostAsync("http://ec2-54-66-6-158.ap-southeast-2.compute.amazonaws.com:5153/ocr/", content, cancellationToken);
+                var response = await _httpClient.PostAsync(url, content, cancellationToken);
                 response.EnsureSuccessStatusCode();
 
                 var json = await response.Content.ReadAsStringAsync(cancellationToken);
@@ -81,13 +82,15 @@ namespace PhyGen.Application.Services.Questions
                 // 5. Map to DTO
                 var questions = ocrResult.Questions.Select(q => new QuestionDTO
                 {
-                    Number = q.Number,
-                    Text = q.Question,
+                    Question = q.Question,
                     A = q.A,
                     B = q.B,
                     C = q.C,
                     D = q.D,
-                    Correct = q.Correct
+                    Answer = q.Answer,
+                    Difficulty = q.Difficulty,
+                    Chapter = q.Chapter,
+                    Topic = q.Topic,
                 }).ToList();
 
                 return ApiResult<List<QuestionDTO>>.Success(questions, "Image processed and questions extracted successfully.");
