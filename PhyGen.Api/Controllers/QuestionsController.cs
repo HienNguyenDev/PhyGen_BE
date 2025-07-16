@@ -13,6 +13,7 @@ namespace PhyGen.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class QuestionsController : ControllerBase
 {
     private readonly IQuestionServices _questionService;

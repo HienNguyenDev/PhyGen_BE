@@ -28,10 +28,6 @@ namespace PhyGen.Infrastructure.Configurations
                    .HasForeignKey(x => x.TopicId)
                    .OnDelete(DeleteBehavior.SetNull);
 
-            builder.HasOne(x => x.QuestionOptionSet)
-                   .WithOne(x => x.Question)
-                   .HasForeignKey<Question>(x => x.QuestionOptionSetId)
-                   .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

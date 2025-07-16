@@ -10,7 +10,9 @@ public class QuestionDTO
     public string? C { get; set; }
     public string? D { get; set; }
     public string? Answer { get; set; }
-    public string? Difficulty { get; set; }
-    public string? Chapter { get; set; }
-    public string? Topic { get; set; }
+    public int? Difficulty { get; set; }
+    public int? Chapter { get; set; }
+    public int? Topic { get; set; }
+    public string? ChapterName { get; set; }
+    public string? TopicName { get; set; }
 }

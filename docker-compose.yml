@@ -12,13 +12,13 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
 
-  phygen.ocr:
-    image: phygenocr
-    container_name: PhyGen.OCR
-    build:
-      context: /home/ec2-user/phygen_api
-      dockerfile: Dockerfile
-    ports:
-      - "5153:8000"
-    environment:
-      - PYTHONUNBUFFERED=1
+  # phygen.ocr:
+  #   image: phygenocr
+  #   container_name: PhyGen.OCR
+  #   build:
+  #     context: /home/ec2-user/phygen_api
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "5153:8000"
+  #   environment:
+  #     - PYTHONUNBUFFERED=1

@@ -14,7 +14,6 @@ namespace PhyGen.Domain.Questions
     public class Question : Entity
     {
         public Guid Id { get; set; }
-        public Guid QuestionOptionSetId { get; set; }
         public int? ClassId { get; set; }
         public int? ChapterId { get; set; }
         public int? TopicId { get; set; }

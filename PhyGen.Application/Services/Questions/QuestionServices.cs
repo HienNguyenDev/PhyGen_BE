@@ -27,21 +27,27 @@ namespace PhyGen.Application.Services.Questions
         private readonly IQuestionRepository _questionRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly HttpClient _httpClient;
+        private readonly IDateTimeProvider _dateTimeProvider;
+        private readonly IChapterRepository _chapterRepository;
+        private readonly ITopicRepository _topicRepository;
         //private readonly ICacheService _cacheService;
 
         public QuestionServices(
-            IQuestionRepository questionRepository, HttpClient httpClient, IUnitOfWork unitOfWork)
+            IQuestionRepository questionRepository, HttpClient httpClient, IUnitOfWork unitOfWork, IDateTimeProvider dateTimeProvider, ITopicRepository topicRepository, IChapterRepository chapterRepository)
         //ICacheService cacheService)
         {
             _questionRepository = questionRepository;
             _httpClient = httpClient;
             _unitOfWork = unitOfWork;
+            _dateTimeProvider = dateTimeProvider;
+            _topicRepository = topicRepository;
+            _chapterRepository = chapterRepository;
             //_cacheService = cacheService;
         }
         public async Task<ApiResult<List<QuestionDTO>>> ProcessQuestionImageFromPythonAsync(IFormFile file, CancellationToken cancellationToken)
         {
             string tempImagePath = null;
-            string url = "http://20.255.189.211:8000/question/label-data";
+            string url = "http://20.255.120.219:8000/question/label-data";
 
             try
             {
@@ -80,6 +86,7 @@ namespace PhyGen.Application.Services.Questions
                     return ApiResult<List<QuestionDTO>>.Failure("OCR succeeded but no questions were detected.");
 
                 // 5. Map to DTO
+                
                 var questions = ocrResult.Questions.Select(q => new QuestionDTO
                 {
                     Question = q.Question,
@@ -89,9 +96,76 @@ namespace PhyGen.Application.Services.Questions
                     D = q.D,
                     Answer = q.Answer,
                     Difficulty = q.Difficulty,
-                    Chapter = q.Chapter,
-                    Topic = q.Topic,
+                    Chapter = q.Chapter_id,     
+                    Topic = q.Topic_id
                 }).ToList();
+
+                var chapterIds = questions
+                    .Where(q => q.Chapter.HasValue)
+                    .Select(q => q.Chapter.Value)
+                    .Distinct()
+                    .ToList();
+
+                var topicIds = questions
+                    .Where(q => q.Topic.HasValue)
+                    .Select(q => q.Topic.Value)
+                    .Distinct()
+                    .ToList();
+
+                var chapterDict = new Dictionary<int, string>();
+                foreach (var chapterId in chapterIds)
+                {
+                    var chapter = await _chapterRepository.GetByIdAsync(chapterId);
+                    if (chapter != null)
+                        chapterDict[chapterId] = chapter.ChapterName;
+                }
+
+                var topicDict = new Dictionary<int, string>();
+                foreach (var topicId in topicIds)
+                {
+                    var topic = await _topicRepository.GetByIdAsync(topicId);
+                    if (topic != null)
+                        topicDict[topicId] = topic.TopicName;
+                }
+
+                foreach (var dto in questions)
+                {
+                    if (dto.Chapter.HasValue && chapterDict.TryGetValue(dto.Chapter.Value, out var chapterName))
+                        dto.ChapterName = chapterName;
+
+                    if (dto.Topic.HasValue && topicDict.TryGetValue(dto.Topic.Value, out var topicName))
+                        dto.TopicName = topicName;
+                }
+
+                //6.Save DB
+                foreach (var questionDto in questions)
+                {
+                    var questionId = Guid.NewGuid();
+                    var optionSetId = Guid.NewGuid();
+
+                    var question = new Question
+                    {
+                        Id = questionId,
+                        ClassId = 1,
+                        ChapterId = questionDto.Chapter ?? 0,
+                        TopicId = questionDto.Topic ?? 0,
+                        QuestionContent = questionDto.Question ?? string.Empty,
+                        Difficulty = questionDto.Difficulty ?? 1,
+                        CreatedAt = _dateTimeProvider.UtcNow,
+                        QuestionOptionSet = new QuestionOptionSet
+                        {
+                            Id = optionSetId,
+                            QuestionId = questionId,
+                            A = questionDto.A,
+                            B = questionDto.B,
+                            C = questionDto.C,
+                            D = questionDto.D,
+                            Correct = questionDto.Answer
+                        },
+                    };
+                    await _questionRepository.AddAsync(question);
+                }
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 return ApiResult<List<QuestionDTO>>.Success(questions, "Image processed and questions extracted successfully.");
             }

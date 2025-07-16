@@ -159,9 +159,6 @@ namespace PhyGen.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("QuestionOptionSetId")
-                        .HasColumnType("uuid");
-
                     b.Property<int?>("TopicId")
                         .HasColumnType("integer");
 

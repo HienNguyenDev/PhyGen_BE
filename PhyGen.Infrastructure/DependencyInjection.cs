@@ -11,6 +11,7 @@ using PhyGen.Application.Abstractions.Authentication;
 using PhyGen.Application.Abstractions.Data;
 using PhyGen.Application.Common.Interfaces;
 using PhyGen.Application.Common.Interfaces.Repository;
+using PhyGen.Application.Services.Chapters;
 using PhyGen.Application.Services.Classes;
 using PhyGen.Application.Services.ExamSets;
 using PhyGen.Application.Services.Firebase;
@@ -92,6 +93,7 @@ namespace PhyGen.Infrastructure
             services.AddScoped<IClassRepository, ClassRepository>();
             services.AddScoped<IQuestionRepository, QuestionRepository>();
             services.AddScoped<IExamSetRepository, ExamSetRepository>();
+            services.AddScoped<IChapterRepository, ChapterRepository>();
 
             //Unit of Work
             services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -107,6 +109,7 @@ namespace PhyGen.Infrastructure
             services.AddScoped<IClassServices, ClassServices>();
             services.AddScoped<IQuestionServices, QuestionServices>();
             services.AddScoped<IExamSetServices, ExamSetServices>();
+            services.AddScoped<IChapterServices, ChapterServices>();
             return services;
         }
 

@@ -14,8 +14,8 @@ namespace PhyGen.Application.DTOs.OCR
         public string? C { get; set; }
         public string? D { get; set; }
         public string? Answer { get; set; }
-        public string? Difficulty { get; set; }
-        public string? Chapter { get; set; }
-        public string? Topic { get; set; }
+        public int? Difficulty { get; set; }
+        public int? Chapter_id { get; set; }
+        public int? Topic_id { get; set; }
     }
 }
