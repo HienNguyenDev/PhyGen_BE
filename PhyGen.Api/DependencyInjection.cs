@@ -7,9 +7,13 @@ public static class DependencyInjection
             services.AddSwaggerGen();
 
             // REMARK: If you want to use Controllers, you'll need this.
-            services.AddControllers();
+            services.AddControllers().AddJsonOptions(x =>
+            {
+                x.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+                x.JsonSerializerOptions.WriteIndented = true;
+            });
 
-            services.AddProblemDetails();
+        services.AddProblemDetails();
 
             return services;
        }

@@ -7,12 +7,12 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using PhyGen.Application.DTOs.ExamSet;
 
 namespace PhyGen.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
     public class ExamSetsController : ControllerBase
     {
         private readonly IExamSetServices _examSetServices;
@@ -66,6 +66,16 @@ namespace PhyGen.Api.Controllers
             if (!result.IsSuccess)
                 return BadRequest(ApiResult<bool>.Failure(result.Message));
             return Ok(ApiResult<bool>.Success(result.Data, result.Message));
+        }
+
+        [HttpPost("generate-exam-from-prompt")]
+        public async Task<IActionResult> GenerateExamFromPrompt([FromBody] PromptRequest request)
+        {
+            var result = await _examSetServices.GenerateExamFromPromptAsync(request.Prompt);
+            if (!result.IsSuccess)
+                return BadRequest(result);
+
+            return Ok(result);
         }
     }
 }

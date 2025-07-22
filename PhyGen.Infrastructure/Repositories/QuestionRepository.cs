@@ -1,4 +1,4 @@
-using PhyGen.Application.Common.Interfaces.Repository;
+﻿using PhyGen.Application.Common.Interfaces.Repository;
 using PhyGen.Domain.Questions;
 using PhyGen.Infrastructure.Database;
 using PhyGen.Infrastructure.Persistence;
@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using PhyGen.Domain.Common;
+using PhyGen.Application.DTOs.ExamSet;
 
 namespace PhyGen.Infrastructure.Repositories
 {
@@ -16,6 +17,15 @@ namespace PhyGen.Infrastructure.Repositories
     {
         public QuestionRepository(ApplicationDbContext context) : base(context)
         {
+        }
+        public IQueryable<Question> GetQueryableWithIncludes()
+        {
+            return _context.Questions
+                .Include(q => q.QuestionOptionSet)
+                .Include(q => q.Class)
+                .Include(q => q.Chapter)
+                .Include(q => q.Topic)
+                .AsQueryable();
         }
 
         public async Task<Page<Question>> GetQuestionsPaginatedAsync(

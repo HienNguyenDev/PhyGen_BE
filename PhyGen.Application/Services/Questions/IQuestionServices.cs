@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using PhyGen.Application.Common;
 using PhyGen.Application.DTOs;
+using PhyGen.Application.DTOs.ExamSet;
 using PhyGen.Application.DTOs.Questions;
 using PhyGen.Domain.Common;
 using PhyGen.Domain.Questions;
@@ -15,4 +16,6 @@ public interface IQuestionServices
     Task<ApiResult<Question>> CreateAsync(Question question, CancellationToken cancellationToken);
     Task<ApiResult<Question>> UpdateAsync(Question question, CancellationToken cancellationToken);
     Task<ApiResult<bool>> DeleteAsync(Guid id, CancellationToken cancellationToken);
+    Task<List<Question>> GenerateQuestionsFromRequestsAsync(List<QuestionRequest> requests);
+    Task<List<Question>> GenerateQuestionsFromDropDownAsync(int quantity, string Chapter, string Topic, string Class);
 }

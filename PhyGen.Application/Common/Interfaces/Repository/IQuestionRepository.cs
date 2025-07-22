@@ -1,4 +1,5 @@
-﻿using PhyGen.Domain.Common;
+﻿using PhyGen.Application.DTOs.ExamSet;
+using PhyGen.Domain.Common;
 using PhyGen.Domain.Questions;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,7 @@ namespace PhyGen.Application.Common.Interfaces.Repository
 {
     public interface IQuestionRepository : IGenericRepository<Question>
     {
+        IQueryable<Question> GetQueryableWithIncludes();
         Task<Page<Question>> GetQuestionsPaginatedAsync(
             int pageNumber,
             int pageSize,

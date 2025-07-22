@@ -6,6 +6,7 @@ using PhyGen.Application.Common;
 using PhyGen.Application.Common.Interfaces;
 using PhyGen.Application.Common.Interfaces.Repository;
 using PhyGen.Application.DTOs;
+using PhyGen.Application.DTOs.ExamSet;
 using PhyGen.Application.DTOs.OCR;
 using PhyGen.Application.DTOs.Questions;
 using PhyGen.Domain.Common;
@@ -228,5 +229,65 @@ namespace PhyGen.Application.Services.Questions
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             return ApiResult<bool>.Success(true, "Question deleted successfully");
         }
+        public async Task<List<Question>> GenerateQuestionsFromRequestsAsync(List<QuestionRequest> requests)
+        {
+            var result = new List<Question>();
+            var usedQuestionIds = new HashSet<Guid>();
+
+            foreach (var req in requests)
+            {
+                var query = _questionRepository.GetQueryableWithIncludes();
+
+                if (req.ChapterId.HasValue)
+                    query = query.Where(q => q.ChapterId == req.ChapterId);
+
+                if (req.TopicId.HasValue)
+                    query = query.Where(q => q.TopicId == req.TopicId);
+
+                if (req.DifficultyLevel.HasValue)
+                    query = query.Where(q => q.Difficulty == req.DifficultyLevel);
+
+                query = query.Where(q => !usedQuestionIds.Contains(q.Id));
+
+                var selected = await query.OrderBy(q => Guid.NewGuid())
+                                          .Take(req.Quantity)
+                                          .ToListAsync();
+
+                foreach (var q in selected)
+                    usedQuestionIds.Add(q.Id);
+
+                result.AddRange(selected);
+            }
+
+            return result;
+        }
+
+        public async Task<List<Question>> GenerateQuestionsFromDropDownAsync(int quantity, string Chapter, string Topic, string Class)
+        {
+            var usedQuestionIds = new HashSet<Guid>();
+
+            var query = _questionRepository.GetQueryableWithIncludes();
+
+            if (!string.IsNullOrWhiteSpace(Chapter))
+                query = query.Where(q => q.Chapter.ChapterName == Chapter);
+
+            if (!string.IsNullOrWhiteSpace(Topic))
+                query = query.Where(q => q.Topic.TopicName == Topic);
+
+            if (!string.IsNullOrWhiteSpace(Class))
+                query = query.Where(q => q.Class.ClassName == Class); 
+
+            query = query.Where(q => !usedQuestionIds.Contains(q.Id));
+
+            var selected = await query.OrderBy(q => Guid.NewGuid())
+                                      .Take(quantity)
+                                      .ToListAsync();
+
+            foreach (var q in selected)
+                usedQuestionIds.Add(q.Id);
+
+            return selected;
+        }
+
     }
 }
