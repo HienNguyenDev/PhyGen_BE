@@ -17,5 +17,5 @@ public interface IQuestionServices
     Task<ApiResult<Question>> UpdateAsync(Question question, CancellationToken cancellationToken);
     Task<ApiResult<bool>> DeleteAsync(Guid id, CancellationToken cancellationToken);
     Task<List<Question>> GenerateQuestionsFromRequestsAsync(List<QuestionRequest> requests);
-    Task<List<Question>> GenerateQuestionsFromDropDownAsync(int quantity, string Chapter, string Topic, string Class);
+    Task<List<Question>> GenerateQuestionsFromDropDownAsync(int quantity, int? chapterId, int? topicId, int? classId);
 }

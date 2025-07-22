@@ -73,9 +73,19 @@ namespace PhyGen.Api.Controllers
         {
             var result = await _examSetServices.GenerateExamFromPromptAsync(request.Prompt);
             if (!result.IsSuccess)
-                return BadRequest(result);
+                return BadRequest(ApiResult<List<ExamResult>>.Failure(result.Message));
 
-            return Ok(result);
+            return Ok(ApiResult<List<ExamResult>>.Success(result.Data, result.Message));
+        }
+
+        [HttpPost("generate-exam-from-dropdown")]
+        public async Task<IActionResult> GenerateExamFromDropDown([FromBody] DropDownRequest request)
+        {
+            var result = await _examSetServices.GenerateExamFromDropDownAsync(request.Quantity, request.Chapter, request.Topic, request.Class);
+            if (!result.IsSuccess)
+                return BadRequest(ApiResult<List<ExamResult>>.Failure(result.Message));
+
+            return Ok(ApiResult<List<ExamResult>>.Success(result.Data, result.Message));
         }
     }
 }

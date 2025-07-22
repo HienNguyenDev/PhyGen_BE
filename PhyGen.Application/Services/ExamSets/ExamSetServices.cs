@@ -32,32 +32,34 @@ namespace PhyGen.Application.Services.ExamSets
             _httpClient = httpClient;
         }
 
-        //public async Task<ApiResult<List<ExamResult>> GenerateExamFromDropDownAsync(int quantity, string Chapter, string Topic, string Class)
-        //{
-        //    try
-        //    {
-        //        var result = _questionServices.GenerateQuestionsFromDropDownAsync(quantity, Chapter, Topic, Class);
-        //        var ExamResult = result.Select(c => new ExamResult
-        //        {
-        //            Id = q.Id,
-        //            Question = q.QuestionContent,
-        //            ClassName = q.Class?.ClassName,
-        //            ChapterName = q.Chapter?.ChapterName,
-        //            TopicName = q.Topic?.TopicName,
-        //            Difficulty = q.Difficulty,
-        //            A = q.QuestionOptionSet.A,
-        //            B = q.QuestionOptionSet.B,
-        //            C = q.QuestionOptionSet.C,
-        //            D = q.QuestionOptionSet.D,
-        //            Answer = q.QuestionOptionSet.Correct
-        //        }).ToList();
-        //        return ApiResult<List<ExamResult>>.Success(ExamResult, "Exam generated");
-        //    } catch (Exception ex) {
-
-        //    }
-
-        //    return
-        //}
+        public async Task<ApiResult<List<ExamResult>>> GenerateExamFromDropDownAsync(int quantity, int Chapter, int Topic, int Class)
+        {
+            try
+            {
+                var result = await _questionServices.GenerateQuestionsFromDropDownAsync(quantity, Chapter, Topic, Class);
+                var ExamResults = result.Select(q => new ExamResult
+                {
+                    Id = q.Id,
+                    Question = q.QuestionContent,
+                    ClassName = q.Class?.ClassName,
+                    ChapterId = q.ChapterId,
+                    ChapterName = q.Chapter?.ChapterName,
+                    TopicId = q.TopicId,
+                    TopicName = q.Topic?.TopicName,
+                    Difficulty = q.Difficulty,
+                    A = q.QuestionOptionSet.A,
+                    B = q.QuestionOptionSet.B,
+                    C = q.QuestionOptionSet.C,
+                    D = q.QuestionOptionSet.D,
+                    Answer = q.QuestionOptionSet.Correct
+                }).ToList();
+                return ApiResult<List<ExamResult>>.Success(ExamResults, "Exam generated");
+            }
+            catch (Exception ex)
+            {
+                return ApiResult<List<ExamResult>>.Failure("Error: " + ex.Message);
+            }
+        }
 
         public async Task<ApiResult<List<ExamResult>>> GenerateExamFromPromptAsync(string prompt)
         {

@@ -262,24 +262,24 @@ namespace PhyGen.Application.Services.Questions
             return result;
         }
 
-        public async Task<List<Question>> GenerateQuestionsFromDropDownAsync(int quantity, string Chapter, string Topic, string Class)
+        public async Task<List<Question>> GenerateQuestionsFromDropDownAsync(int quantity, int? chapterId, int? topicId, int? classId)
         {
             var usedQuestionIds = new HashSet<Guid>();
 
             var query = _questionRepository.GetQueryableWithIncludes();
 
-            if (!string.IsNullOrWhiteSpace(Chapter))
-                query = query.Where(q => q.Chapter.ChapterName == Chapter);
+            if (chapterId.HasValue)
+                query = query.Where(q => q.ChapterId == chapterId.Value);
 
-            if (!string.IsNullOrWhiteSpace(Topic))
-                query = query.Where(q => q.Topic.TopicName == Topic);
+            if (topicId.HasValue)
+                query = query.Where(q => q.TopicId == topicId.Value);
 
-            if (!string.IsNullOrWhiteSpace(Class))
-                query = query.Where(q => q.Class.ClassName == Class); 
+            if (classId.HasValue)
+                query = query.Where(q => q.ClassId == classId.Value);
 
             query = query.Where(q => !usedQuestionIds.Contains(q.Id));
 
-            var selected = await query.OrderBy(q => Guid.NewGuid())
+            var selected = await query.OrderBy(q => Guid.NewGuid()) // để random
                                       .Take(quantity)
                                       .ToListAsync();
 
@@ -288,6 +288,5 @@ namespace PhyGen.Application.Services.Questions
 
             return selected;
         }
-
     }
 }
