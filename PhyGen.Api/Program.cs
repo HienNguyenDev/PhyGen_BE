@@ -16,6 +16,17 @@ builder.Services.AddApplication()
                 .AddPresentation()
                 .AddInfrastructure(builder.Configuration);
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader();
+    });
+
+});
 var app = builder.Build();
 
 app.UseSwaggerWithUi();
