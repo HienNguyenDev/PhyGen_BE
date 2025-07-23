@@ -5,6 +5,7 @@ using System.Reflection.Metadata;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using iText.Bouncycastleconnector;
 using iText.IO.Font;
 using iText.Kernel.Font;
 using iText.Kernel.Pdf;
@@ -57,7 +58,7 @@ namespace PhyGen.Application.Services.ExamSets
                 {
                     Id = Guid.NewGuid(),
                     Title = "ĐỀ THI VẬT LÍ",
-                    Description = null,
+                    Description = "Đề thi được tạo ra bởi AI",
                     ClassId = Class,
                     CreatedBy = _userContext.UserId, 
                     CreatedAt = _dateTimeProvider.UtcNow,
@@ -106,7 +107,7 @@ namespace PhyGen.Application.Services.ExamSets
 
         public async Task<ApiResult<List<ExamResult>>> GenerateExamFromPromptAsync(string prompt)
         {
-            var pythonApiUrl = "http://20.255.120.219:8000/prompt/prompt";
+            var pythonApiUrl = "http://20.212.140.228:8000/prompt/prompt";
 
             try
             {
@@ -139,7 +140,7 @@ namespace PhyGen.Application.Services.ExamSets
                 {
                     Id = Guid.NewGuid(),
                     Title = "ĐỀ THI VẬT LÍ",
-                    Description = null,
+                    Description = "Đề thi được tạo ra bởi AI",
                     ClassId = 1,
                     CreatedBy = _userContext.UserId,
                     CreatedAt = _dateTimeProvider.UtcNow,
@@ -185,53 +186,53 @@ namespace PhyGen.Application.Services.ExamSets
             }
         }
 
-        public async Task<(byte[] FileBytes, string FileName)> GenerateExamPdfAsync(Guid examSetId)
-        {
-            var examSet = await _examSetRepository.GetByIdWithQuestionsAsync(examSetId);
-            if (examSet == null)
-                throw new Exception("Exam set not found.");
+        //public async Task<(byte[] FileBytes, string FileName)> GenerateExamPdfAsync(Guid examSetId)
+        //{
+        //    var examSet = await _examSetRepository.GetByIdWithQuestionsAsync(examSetId);
+        //    if (examSet == null)
+        //        throw new Exception("Exam set not found.");
 
-            var ms = new MemoryStream();
-            var writer = new PdfWriter(ms);
-            var pdf = new PdfDocument(writer);
-            var document = new iText.Layout.Document(pdf);
+        //    var ms = new MemoryStream();
+        //    var writer = new PdfWriter(ms);
+        //    var pdf = new PdfDocument(writer);
+        //    var document = new iText.Layout.Document(pdf);
 
-            //Font Unicode
-            var fontPath = Path.Combine(Directory.GetCurrentDirectory(), "Fonts", "arial-unicode-ms.ttf");
-            if (File.Exists(fontPath))
-            {
-                var font = PdfFontFactory.CreateFont(fontPath, PdfEncodings.IDENTITY_H, EmbeddingStrategy.PREFER_EMBEDDED);
-                document.SetFont(font);
-            }
+        //    //Font Unicode
+        //    var fontPath = Path.Combine(Directory.GetCurrentDirectory(), "Fonts", "arial-unicode-ms.ttf");
+        //    if (File.Exists(fontPath))
+        //    {
+        //        var font = PdfFontFactory.CreateFont(fontPath, PdfEncodings.IDENTITY_H, EmbeddingStrategy.PREFER_EMBEDDED);
+        //        document.SetFont(font);
+        //    }
             
-            //Title
-            document.Add(new Paragraph("ĐỀ THI VẬT LÍ")
-                .SetFontSize(16)
-                .SetBold()
-                .SetTextAlignment(TextAlignment.CENTER)
-                .SetMarginBottom(20));
+        //    //Title
+        //    document.Add(new Paragraph("ĐỀ THI VẬT LÍ")
+        //        .SetFontSize(16)
+        //        .SetBold()
+        //        .SetTextAlignment(TextAlignment.CENTER)
+        //        .SetMarginBottom(20));
 
-            int index = 1;
-            foreach (var q in examSet.ExamSetQuestions.OrderBy(x => x.Order))
-            {
-                var question = q.Question;
-                document.Add(new Paragraph($"{index}. {question.QuestionContent}")
-                    .SetFontSize(12)
-                    .SetBold());
-                document.Add(new Paragraph($"A. {question.QuestionOptionSet.A}"));
-                document.Add(new Paragraph($"B. {question.QuestionOptionSet.B}"));
-                document.Add(new Paragraph($"C. {question.QuestionOptionSet.C}"));
-                document.Add(new Paragraph($"D. {question.QuestionOptionSet.D}"));
-                document.Add(new Paragraph(""));
+        //    int index = 1;
+        //    foreach (var q in examSet.ExamSetQuestions.OrderBy(x => x.Order))
+        //    {
+        //        var question = q.Question;
+        //        document.Add(new Paragraph($"Câu {index}: {question.QuestionContent}")
+        //            .SetFontSize(12)
+        //            .SetBold());
+        //        document.Add(new Paragraph($"A. {question.QuestionOptionSet.A}"));
+        //        document.Add(new Paragraph($"B. {question.QuestionOptionSet.B}"));
+        //        document.Add(new Paragraph($"C. {question.QuestionOptionSet.C}"));
+        //        document.Add(new Paragraph($"D. {question.QuestionOptionSet.D}"));
+        //        document.Add(new Paragraph(""));
 
-                index++;
-            }
+        //        index++;
+        //    }
 
-            document.Close();
+        //    document.Close();
 
-            var fileName = $"DeThi_{DateTime.UtcNow:yyyyMMddHHmmss}.pdf";
-            return (ms.ToArray(), fileName);
-        }
+        //    var fileName = $"DeThiVatLi_{_dateTimeProvider.UtcNow:yyyyMMddHHmmss}.pdf";
+        //    return (ms.ToArray(), fileName);
+        //}
 
         //public async Task<List<ExamSet>> GetExamSetsByCurrentUserAsync()
         //{

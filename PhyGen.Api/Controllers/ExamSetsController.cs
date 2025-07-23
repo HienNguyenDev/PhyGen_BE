@@ -81,7 +81,7 @@ namespace PhyGen.Api.Controllers
         [HttpPost("generate-exam-from-dropdown")]
         public async Task<IActionResult> GenerateExamFromDropDown([FromBody] DropDownRequest request)
         {
-            var result = await _examSetServices.GenerateExamFromDropDownAsync(request.Quantity, request.Chapter, request.Topic, request.Class);
+            var result = await _examSetServices.GenerateExamFromDropDownAsync(request.Quantity, request.ChapterId, request.TopicId, request.ClassId);
             if (!result.IsSuccess)
                 return BadRequest(ApiResult<List<ExamResult>>.Failure(result.Message));
 
@@ -96,6 +96,20 @@ namespace PhyGen.Api.Controllers
         //        return BadRequest(ApiResult<List<ExamSet>>.Failure(result.Message));
 
         //    return Ok(ApiResult<List<ExamSet>>.Success(result.Data, result.Message));
+        //}
+
+        //[HttpGet("download-exam-pdf/{examSetId}")]
+        //public async Task<IActionResult> DownloadExamPdf(Guid examSetId)
+        //{
+        //    try
+        //    {
+        //        var (fileBytes, fileName) = await _examSetServices.GenerateExamPdfAsync(examSetId);
+        //        return File(fileBytes, "application/pdf", fileName);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest($"Error: {ex.Message}");
+        //    }
         //}
     }
 }

@@ -26,11 +26,6 @@ namespace PhyGen.Infrastructure.Configurations
                    .WithOne(x => x.Creator)
                    .HasForeignKey(x => x.CreatedBy)
                    .OnDelete(DeleteBehavior.Restrict);
-
-            builder.HasMany(x => x.ReviewedExamSets)
-                   .WithOne(x => x.Reviewer)
-                   .HasForeignKey(x => x.ReviewedBy)
-                   .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

@@ -48,7 +48,7 @@ namespace PhyGen.Application.Services.Questions
         public async Task<ApiResult<List<QuestionDTO>>> ProcessQuestionImageFromPythonAsync(IFormFile file, CancellationToken cancellationToken)
         {
             string tempImagePath = null;
-            string url = "http://20.255.120.219:8000/question/label-data";
+            string url = "http://20.212.140.228:8000/question/label-data";
 
             try
             {

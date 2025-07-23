@@ -9,9 +9,9 @@ namespace PhyGen.Application.DTOs.ExamSet
     public class DropDownRequest
     {
         public int Quantity { get; set; }
-        public int Chapter { get; set; } 
-        public int Topic { get; set; }
-        public int Class { get; set; } 
+        public int ChapterId { get; set; } 
+        public int TopicId { get; set; }
+        public int ClassId { get; set; } 
 
     }
 }

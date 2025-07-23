@@ -20,7 +20,6 @@ namespace PhyGen.Domain.Users
         public DateTime CreatedAt { get; set; }
 
         public ICollection<ExamSet> CreatedExamSets { get; set; }
-        public ICollection<ExamSet> ReviewedExamSets { get; set; }
     }
 
 }

@@ -83,16 +83,6 @@ namespace PhyGen.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("ReviewNote")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime?>("ReviewedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid?>("ReviewedBy")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("text");
@@ -107,8 +97,6 @@ namespace PhyGen.Infrastructure.Migrations
                     b.HasIndex("ClassId");
 
                     b.HasIndex("CreatedBy");
-
-                    b.HasIndex("ReviewedBy");
 
                     b.ToTable("ExamSets", "public");
                 });
@@ -328,16 +316,9 @@ namespace PhyGen.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("PhyGen.Domain.Users.User", "Reviewer")
-                        .WithMany("ReviewedExamSets")
-                        .HasForeignKey("ReviewedBy")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.Navigation("Class");
 
                     b.Navigation("Creator");
-
-                    b.Navigation("Reviewer");
                 });
 
             modelBuilder.Entity("PhyGen.Domain.ExamSets.ExamSetQuestion", b =>
@@ -450,8 +431,6 @@ namespace PhyGen.Infrastructure.Migrations
             modelBuilder.Entity("PhyGen.Domain.Users.User", b =>
                 {
                     b.Navigation("CreatedExamSets");
-
-                    b.Navigation("ReviewedExamSets");
                 });
 #pragma warning restore 612, 618
         }

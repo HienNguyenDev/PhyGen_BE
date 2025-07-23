@@ -18,13 +18,8 @@ namespace PhyGen.Domain.ExamSets
         public Guid CreatedBy { get; set; }
         public DateTime CreatedAt { get; set; }
         public string Status { get; set; }
-        public Guid? ReviewedBy { get; set; }
-        public DateTime? ReviewedAt { get; set; }
-        public string ReviewNote { get; set; }
-
         public Class Class { get; set; }
         public User Creator { get; set; }
-        public User Reviewer { get; set; }
         public ICollection<ExamSetQuestion> ExamSetQuestions { get; set; }
     }
 

@@ -12,9 +12,7 @@ namespace PhyGen.Infrastructure.Configurations
             builder.Property(x => x.Title).IsRequired().HasMaxLength(255);
             builder.Property(x => x.Description).HasColumnType("text");
             builder.Property(x => x.Status).IsRequired();
-            builder.Property(x => x.ReviewNote).HasColumnType("text");
             builder.Property(x => x.CreatedAt);
-            builder.Property(x => x.ReviewedAt);
 
             builder.HasOne(x => x.Class)
                    .WithMany(x => x.ExamSets)
@@ -24,11 +22,6 @@ namespace PhyGen.Infrastructure.Configurations
             builder.HasOne(x => x.Creator)
                    .WithMany(u => u.CreatedExamSets)
                    .HasForeignKey(x => x.CreatedBy)
-                   .OnDelete(DeleteBehavior.Restrict);
-
-            builder.HasOne(x => x.Reviewer)
-                   .WithMany(u => u.ReviewedExamSets)
-                   .HasForeignKey(x => x.ReviewedBy)
                    .OnDelete(DeleteBehavior.Restrict);
         }
     }
