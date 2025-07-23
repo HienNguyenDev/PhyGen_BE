@@ -32,9 +32,6 @@ namespace PhyGen.Infrastructure.Repositories
         {
             return await _context.ExamSets
                 .Where(e => e.CreatedBy == createdBy)
-                .Include(e => e.ExamSetQuestions)
-                    .ThenInclude(esq => esq.Question)
-                    .ThenInclude(q => q.QuestionOptionSet)
                 .OrderByDescending(e => e.CreatedAt)
                 .ToListAsync();
         }
