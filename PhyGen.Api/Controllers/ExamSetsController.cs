@@ -87,5 +87,15 @@ namespace PhyGen.Api.Controllers
 
             return Ok(ApiResult<List<ExamResult>>.Success(result.Data, result.Message));
         }
+
+        //[HttpGet("get-exam-user-generated")]
+        //public async Task<IActionResult> GetExamUserGenerated()
+        //{
+        //    var result = await _examSetServices.GetExamSetsByCurrentUserAsync();
+        //    if (!result.IsSuccess)
+        //        return BadRequest(ApiResult<List<ExamSet>>.Failure(result.Message));
+
+        //    return Ok(ApiResult<List<ExamSet>>.Success(result.Data, result.Message));
+        //}
     }
 }

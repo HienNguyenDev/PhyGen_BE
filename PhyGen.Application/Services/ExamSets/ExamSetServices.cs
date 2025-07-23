@@ -1,9 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using iText.IO.Font;
+using iText.Kernel.Font;
+using iText.Kernel.Pdf;
+using iText.Layout;
+using iText.Layout.Element;
+using iText.Layout.Properties;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using PhyGen.Application.Abstractions.Authentication;
@@ -17,6 +24,7 @@ using PhyGen.Domain.Classes;
 using PhyGen.Domain.Common;
 using PhyGen.Domain.ExamSets;
 using PhyGen.Domain.Questions;
+using static iText.Kernel.Font.PdfFontFactory;
 
 namespace PhyGen.Application.Services.ExamSets
 {
@@ -45,7 +53,6 @@ namespace PhyGen.Application.Services.ExamSets
             {
                 var questions = await _questionServices.GenerateQuestionsFromDropDownAsync(quantity, Chapter, Topic, Class);
 
-                // ✅ Tạo ExamSet mới
                 var examSet = new ExamSet
                 {
                     Id = Guid.NewGuid(),
@@ -141,7 +148,7 @@ namespace PhyGen.Application.Services.ExamSets
                 };
 
                 int order = 1;
-                foreach (var q in questions)
+                foreach (var q in questions)    
                 {
                     examSet.ExamSetQuestions.Add(new ExamSetQuestion
                     {
@@ -177,6 +184,61 @@ namespace PhyGen.Application.Services.ExamSets
                 return ApiResult<List<ExamResult>>.Failure($"Exception occurred: {ex.Message}");
             }
         }
+
+        public async Task<(byte[] FileBytes, string FileName)> GenerateExamPdfAsync(Guid examSetId)
+        {
+            var examSet = await _examSetRepository.GetByIdWithQuestionsAsync(examSetId);
+            if (examSet == null)
+                throw new Exception("Exam set not found.");
+
+            var ms = new MemoryStream();
+            var writer = new PdfWriter(ms);
+            var pdf = new PdfDocument(writer);
+            var document = new iText.Layout.Document(pdf);
+
+            //Font Unicode
+            var fontPath = Path.Combine(Directory.GetCurrentDirectory(), "Fonts", "arial-unicode-ms.ttf");
+            if (File.Exists(fontPath))
+            {
+                var font = PdfFontFactory.CreateFont(fontPath, PdfEncodings.IDENTITY_H, EmbeddingStrategy.PREFER_EMBEDDED);
+                document.SetFont(font);
+            }
+            
+            //Title
+            document.Add(new Paragraph("ĐỀ THI VẬT LÍ")
+                .SetFontSize(16)
+                .SetBold()
+                .SetTextAlignment(TextAlignment.CENTER)
+                .SetMarginBottom(20));
+
+            int index = 1;
+            foreach (var q in examSet.ExamSetQuestions.OrderBy(x => x.Order))
+            {
+                var question = q.Question;
+                document.Add(new Paragraph($"{index}. {question.QuestionContent}")
+                    .SetFontSize(12)
+                    .SetBold());
+                document.Add(new Paragraph($"A. {question.QuestionOptionSet.A}"));
+                document.Add(new Paragraph($"B. {question.QuestionOptionSet.B}"));
+                document.Add(new Paragraph($"C. {question.QuestionOptionSet.C}"));
+                document.Add(new Paragraph($"D. {question.QuestionOptionSet.D}"));
+                document.Add(new Paragraph(""));
+
+                index++;
+            }
+
+            document.Close();
+
+            var fileName = $"DeThi_{DateTime.UtcNow:yyyyMMddHHmmss}.pdf";
+            return (ms.ToArray(), fileName);
+        }
+
+        //public async Task<List<ExamSet>> GetExamSetsByCurrentUserAsync()
+        //{
+        //    var userId = _userContext.UserId;
+        //    var result = await _examSetRepository.GetExamSetsCreatedByAsync(userId);
+        //    return ApiResult<List<ExamSet>>.Success(result, "Lấy danh sách thành công");
+        //}
 
         public async Task<ApiResult<ExamSet>> GetByIdAsync(Guid id)
         {

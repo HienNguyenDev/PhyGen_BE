@@ -10,6 +10,8 @@ namespace PhyGen.Application.Common.Interfaces.Repository
 {
     public interface IExamSetRepository : IGenericRepository<ExamSet>
     {
+        Task<ExamSet> GetByIdWithQuestionsAsync(Guid examSetId);
+        Task<List<ExamSet>> GetExamSetsCreatedByAsync(Guid userId);
         Task<Page<ExamSet>> GetExamSetsPaginatedAsync(
             int pageNumber,
             int pageSize,

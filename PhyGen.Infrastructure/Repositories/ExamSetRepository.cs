@@ -18,6 +18,24 @@ namespace PhyGen.Infrastructure.Repositories
         {
         }
 
+        public async Task<ExamSet> GetByIdWithQuestionsAsync(Guid examSetId)
+        {
+            return await _context.ExamSets
+                .Include(es => es.ExamSetQuestions)
+                .ThenInclude(esq => esq.Question)
+                .ThenInclude(q => q.QuestionOptionSet)
+                .FirstOrDefaultAsync(es => es.Id == examSetId);
+        }
+
+        public async Task<List<ExamSet>> GetExamSetsCreatedByAsync(Guid userId)
+        {
+            return await _context.ExamSets
+            .Include(es => es.Class)
+            .Include(es => es.ExamSetQuestions)
+            .Where(es => es.CreatedBy == userId)
+            .ToListAsync();
+        }
+
         public async Task<Page<ExamSet>> GetExamSetsPaginatedAsync(
             int pageNumber,
             int pageSize,
