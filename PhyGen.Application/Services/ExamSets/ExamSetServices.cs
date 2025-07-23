@@ -223,7 +223,7 @@ namespace PhyGen.Application.Services.ExamSets
 
         public async Task<ApiResult<ExamSet>> GetByIdAsync(Guid id)
         {
-            var examSet = await _examSetRepository.GetByIdAsync(id);
+            var examSet = await _examSetRepository.GetByIdWithQuestionsAsync(id);
             if (examSet == null)
                 return ApiResult<ExamSet>.Failure("ExamSet not found");
             return ApiResult<ExamSet>.Success(examSet, "ExamSet retrieved successfully");

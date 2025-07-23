@@ -12,7 +12,6 @@ namespace PhyGen.Application.Common.Interfaces.Repository
     {
         Task<ExamSet> GetByIdWithQuestionsAsync(Guid examSetId);
         Task<IEnumerable<ExamSet>> GetExamSetsByCreatorAsync(Guid createdBy);
-        Task<List<ExamSet>> GetExamSetsCreatedByAsync(Guid userId);
         Task<Page<ExamSet>> GetExamSetsPaginatedAsync(
             int pageNumber,
             int pageSize,

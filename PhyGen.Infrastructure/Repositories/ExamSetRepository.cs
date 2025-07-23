@@ -36,15 +36,6 @@ namespace PhyGen.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public async Task<List<ExamSet>> GetExamSetsCreatedByAsync(Guid userId)
-        {
-            return await _context.ExamSets
-            .Include(es => es.Class)
-            .Include(es => es.ExamSetQuestions)
-            .Where(es => es.CreatedBy == userId)
-            .ToListAsync();
-        }
-
         public async Task<Page<ExamSet>> GetExamSetsPaginatedAsync(
             int pageNumber,
             int pageSize,
