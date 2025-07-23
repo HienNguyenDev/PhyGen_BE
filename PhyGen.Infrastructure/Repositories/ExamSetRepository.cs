@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using PhyGen.Domain.Common;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace PhyGen.Infrastructure.Repositories
 {
@@ -25,6 +26,17 @@ namespace PhyGen.Infrastructure.Repositories
                 .ThenInclude(esq => esq.Question)
                 .ThenInclude(q => q.QuestionOptionSet)
                 .FirstOrDefaultAsync(es => es.Id == examSetId);
+        }
+
+        public async Task<IEnumerable<ExamSet>> GetExamSetsByCreatorAsync(Guid createdBy)
+        {
+            return await _context.ExamSets
+                .Where(e => e.CreatedBy == createdBy)
+                .Include(e => e.ExamSetQuestions)
+                    .ThenInclude(esq => esq.Question)
+                    .ThenInclude(q => q.QuestionOptionSet)
+                .OrderByDescending(e => e.CreatedAt)
+                .ToListAsync();
         }
 
         public async Task<List<ExamSet>> GetExamSetsCreatedByAsync(Guid userId)

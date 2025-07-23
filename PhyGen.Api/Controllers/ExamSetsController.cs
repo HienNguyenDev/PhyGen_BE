@@ -50,6 +50,18 @@ namespace PhyGen.Api.Controllers
             return File(fileBytes, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", fileName);
         }
 
+        [HttpGet("get-exam-by-current-user")]
+        public async Task<IActionResult> GetExamSetsByCurrentUser()
+        {
+            var result = await _examSetServices.GetExamSetsByCurrentUserAsync();
+
+            if (!result.IsSuccess)
+                return BadRequest(ApiResult<List<ExamSet>>.Failure(result.Message));
+
+            return Ok(ApiResult<List<ExamSet>>.Success(result.Data, result.Message));
+        }
+
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {

@@ -326,5 +326,17 @@ namespace PhyGen.Application.Services.ExamSets
             return output.Trim();
         }
 
+        public async Task<ApiResult<List<ExamSet>>> GetExamSetsByCurrentUserAsync()
+        {
+            var userId = _userContext.UserId;
+
+            var examSets = await _examSetRepository.GetExamSetsByCreatorAsync(userId);
+
+            if (examSets == null || !examSets.Any())
+                return ApiResult<List<ExamSet>>.Failure("No exam sets found for current user");
+
+            return ApiResult<List<ExamSet>>.Success(examSets.ToList(), "Exam sets retrieved successfully");
+        }
+
     }
 }

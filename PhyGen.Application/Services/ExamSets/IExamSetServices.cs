@@ -21,6 +21,6 @@ namespace PhyGen.Application.Services.ExamSets
         Task<ApiResult<ExamSet>> CreateAsync(ExamSet examSet, CancellationToken cancellationToken);
         Task<ApiResult<ExamSet>> UpdateAsync(ExamSet examSet, CancellationToken cancellationToken);
         Task<ApiResult<bool>> DeleteAsync(Guid id, CancellationToken cancellationToken);
-        //Task<List<ExamSet>> GetExamSetsByCurrentUserAsync();
+        Task<ApiResult<List<ExamSet>>> GetExamSetsByCurrentUserAsync();
     }
 }
