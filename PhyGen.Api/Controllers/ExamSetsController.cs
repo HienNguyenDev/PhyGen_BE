@@ -22,6 +22,33 @@ namespace PhyGen.Api.Controllers
             _examSetServices = examSetServices;
         }
 
+        [HttpPost("generate-exam-from-prompt")]
+        public async Task<IActionResult> GenerateExamFromPrompt([FromBody] PromptRequest request)
+        {
+            var result = await _examSetServices.GenerateExamFromPromptAsync(request.Prompt);
+            if (!result.IsSuccess)
+                return BadRequest(ApiResult<List<ExamResult>>.Failure(result.Message));
+
+            return Ok(ApiResult<List<ExamResult>>.Success(result.Data, result.Message));
+        }
+
+        [HttpPost("generate-exam-from-dropdown")]
+        public async Task<IActionResult> GenerateExamFromDropDown([FromBody] DropDownRequest request)
+        {
+            var result = await _examSetServices.GenerateExamFromDropDownAsync(request.Quantity, request.ChapterId, request.TopicId, request.ClassId);
+            if (!result.IsSuccess)
+                return BadRequest(ApiResult<List<ExamResult>>.Failure(result.Message));
+
+            return Ok(ApiResult<List<ExamResult>>.Success(result.Data, result.Message));
+        }
+
+        [HttpGet("download-file-word-exam/{examSetId}")]
+        public async Task<IActionResult> DownloadExamWord(Guid examSetId)
+        {
+            var (fileBytes, fileName) = await _examSetServices.GenerateExamDocxAsync(examSetId);
+            return File(fileBytes, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", fileName);
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
@@ -67,49 +94,5 @@ namespace PhyGen.Api.Controllers
                 return BadRequest(ApiResult<bool>.Failure(result.Message));
             return Ok(ApiResult<bool>.Success(result.Data, result.Message));
         }
-
-        [HttpPost("generate-exam-from-prompt")]
-        public async Task<IActionResult> GenerateExamFromPrompt([FromBody] PromptRequest request)
-        {
-            var result = await _examSetServices.GenerateExamFromPromptAsync(request.Prompt);
-            if (!result.IsSuccess)
-                return BadRequest(ApiResult<List<ExamResult>>.Failure(result.Message));
-
-            return Ok(ApiResult<List<ExamResult>>.Success(result.Data, result.Message));
-        }
-
-        [HttpPost("generate-exam-from-dropdown")]
-        public async Task<IActionResult> GenerateExamFromDropDown([FromBody] DropDownRequest request)
-        {
-            var result = await _examSetServices.GenerateExamFromDropDownAsync(request.Quantity, request.ChapterId, request.TopicId, request.ClassId);
-            if (!result.IsSuccess)
-                return BadRequest(ApiResult<List<ExamResult>>.Failure(result.Message));
-
-            return Ok(ApiResult<List<ExamResult>>.Success(result.Data, result.Message));
-        }
-
-        //[HttpGet("get-exam-user-generated")]
-        //public async Task<IActionResult> GetExamUserGenerated()
-        //{
-        //    var result = await _examSetServices.GetExamSetsByCurrentUserAsync();
-        //    if (!result.IsSuccess)
-        //        return BadRequest(ApiResult<List<ExamSet>>.Failure(result.Message));
-
-        //    return Ok(ApiResult<List<ExamSet>>.Success(result.Data, result.Message));
-        //}
-
-        //[HttpGet("download-exam-pdf/{examSetId}")]
-        //public async Task<IActionResult> DownloadExamPdf(Guid examSetId)
-        //{
-        //    try
-        //    {
-        //        var (fileBytes, fileName) = await _examSetServices.GenerateExamPdfAsync(examSetId);
-        //        return File(fileBytes, "application/pdf", fileName);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest($"Error: {ex.Message}");
-        //    }
-        //}
     }
 }

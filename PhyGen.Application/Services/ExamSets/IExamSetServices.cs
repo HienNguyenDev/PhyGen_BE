@@ -15,7 +15,7 @@ namespace PhyGen.Application.Services.ExamSets
     {
         Task<ApiResult<List<ExamResult>>> GenerateExamFromDropDownAsync(int quantity, int Chapter, int Topic, int Class);
         Task<ApiResult<List<ExamResult>>> GenerateExamFromPromptAsync(string prompt);
-        //Task<(byte[] FileBytes, string FileName)> GenerateExamPdfAsync(Guid examSetId);
+        Task<(byte[] FileBytes, string FileName)> GenerateExamDocxAsync(Guid examSetId);
         Task<ApiResult<ExamSet>> GetByIdAsync(Guid id);
         Task<ApiResult<Page<ExamSet>>> GetPaginatedAsync(int pageNumber, int pageSize, int? classId = null, Guid? createdBy = null, string? searchTerm = null);
         Task<ApiResult<ExamSet>> CreateAsync(ExamSet examSet, CancellationToken cancellationToken);

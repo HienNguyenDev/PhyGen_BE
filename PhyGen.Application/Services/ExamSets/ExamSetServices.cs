@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Metadata;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using PhyGen.Application.Abstractions.Authentication;
@@ -177,61 +179,47 @@ namespace PhyGen.Application.Services.ExamSets
                 return ApiResult<List<ExamResult>>.Failure($"Exception occurred: {ex.Message}");
             }
         }
+        public async Task<(byte[] FileBytes, string FileName)> GenerateExamDocxAsync(Guid examSetId)
+        {
+            var examSet = await _examSetRepository.GetByIdWithQuestionsAsync(examSetId);
+            if (examSet == null)
+                throw new Exception("Exam set not found.");
 
-        //public async Task<(byte[] FileBytes, string FileName)> GenerateExamPdfAsync(Guid examSetId)
-        //{
-        //    var examSet = await _examSetRepository.GetByIdWithQuestionsAsync(examSetId);
-        //    if (examSet == null)
-        //        throw new Exception("Exam set not found.");
+            using var ms = new MemoryStream();
+            using (var wordDoc = WordprocessingDocument.Create(ms, DocumentFormat.OpenXml.WordprocessingDocumentType.Document, true))
+            {
+                var mainPart = wordDoc.AddMainDocumentPart();
+                mainPart.Document = new Document();
+                var body = mainPart.Document.AppendChild(new Body());
 
-        //    var ms = new MemoryStream();
-        //    var writer = new PdfWriter(ms);
-        //    var pdf = new PdfDocument(writer);
-        //    var document = new iText.Layout.Document(pdf);
+                body.AppendChild(new Paragraph(new Run(new Text("ĐỀ THI VẬT LÍ")))
+                {
+                    ParagraphProperties = new ParagraphProperties(
+                        new Justification() { Val = JustificationValues.Center })
+                });
 
-        //    //Font Unicode
-        //    var fontPath = Path.Combine(Directory.GetCurrentDirectory(), "Fonts", "arial-unicode-ms.ttf");
-        //    if (File.Exists(fontPath))
-        //    {
-        //        var font = PdfFontFactory.CreateFont(fontPath, PdfEncodings.IDENTITY_H, EmbeddingStrategy.PREFER_EMBEDDED);
-        //        document.SetFont(font);
-        //    }
-            
-        //    //Title
-        //    document.Add(new Paragraph("ĐỀ THI VẬT LÍ")
-        //        .SetFontSize(16)
-        //        .SetBold()
-        //        .SetTextAlignment(TextAlignment.CENTER)
-        //        .SetMarginBottom(20));
+                body.AppendChild(new Paragraph(new Run(new Text("")))); 
 
-        //    int index = 1;
-        //    foreach (var q in examSet.ExamSetQuestions.OrderBy(x => x.Order))
-        //    {
-        //        var question = q.Question;
-        //        document.Add(new Paragraph($"Câu {index}: {question.QuestionContent}")
-        //            .SetFontSize(12)
-        //            .SetBold());
-        //        document.Add(new Paragraph($"A. {question.QuestionOptionSet.A}"));
-        //        document.Add(new Paragraph($"B. {question.QuestionOptionSet.B}"));
-        //        document.Add(new Paragraph($"C. {question.QuestionOptionSet.C}"));
-        //        document.Add(new Paragraph($"D. {question.QuestionOptionSet.D}"));
-        //        document.Add(new Paragraph(""));
+                int index = 1;
+                foreach (var q in examSet.ExamSetQuestions.OrderBy(x => x.Order))
+                {
+                    var question = q.Question;
+                    body.AppendChild(new Paragraph(new Run(new Text($"Câu {index}: {ConvertLatexToReadable(question.QuestionContent)}"))));
+                    body.AppendChild(new Paragraph(new Run(new Text($"A. {ConvertLatexToReadable(question.QuestionOptionSet.A)}"))));
+                    body.AppendChild(new Paragraph(new Run(new Text($"B. {ConvertLatexToReadable(question.QuestionOptionSet.B)}"))));
+                    body.AppendChild(new Paragraph(new Run(new Text($"C. {ConvertLatexToReadable(question.QuestionOptionSet.C)}"))));
+                    body.AppendChild(new Paragraph(new Run(new Text($"D. {ConvertLatexToReadable(question.QuestionOptionSet.D)}"))));
+                    body.AppendChild(new Paragraph(new Run(new Text(""))));
 
-        //        index++;
-        //    }
+                    index++;
+                }
 
-        //    document.Close();
+                mainPart.Document.Save();
+            }
 
-        //    var fileName = $"DeThiVatLi_{_dateTimeProvider.UtcNow:yyyyMMddHHmmss}.pdf";
-        //    return (ms.ToArray(), fileName);
-        //}
-
-        //public async Task<List<ExamSet>> GetExamSetsByCurrentUserAsync()
-        //{
-        //    var userId = _userContext.UserId;
-        //    var result = await _examSetRepository.GetExamSetsCreatedByAsync(userId);
-        //    return ApiResult<List<ExamSet>>.Success(result, "Lấy danh sách thành công");
-        //}
+            var fileName = $"DeThiVatLi_{_dateTimeProvider.UtcNow:yyyyMMddHHmmss}.docx";
+            return (ms.ToArray(), fileName);
+        }
 
         public async Task<ApiResult<ExamSet>> GetByIdAsync(Guid id)
         {
@@ -273,5 +261,70 @@ namespace PhyGen.Application.Services.ExamSets
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             return ApiResult<bool>.Success(true, "ExamSet deleted successfully");
         }
+        private string ConvertLatexToReadable(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+                return string.Empty;
+
+            var output = input;
+
+            // 1. Remove basic LaTeX formatting
+            output = output.Replace("$", "")
+                           .Replace(@"\,", " ")
+                           .Replace(@"\quad", "    ")
+                           .Replace(@"\text{", "")
+                           .Replace(@"\mathrm{", "")
+                           .Replace("}", "")
+                           .Replace("{", "");
+
+            // 2. Greek letters and constants
+            output = output.Replace(@"\pi", "π")
+                           .Replace(@"\alpha", "α")
+                           .Replace(@"\beta", "β")
+                           .Replace(@"\gamma", "γ")
+                           .Replace(@"\delta", "δ")
+                           .Replace(@"\epsilon", "ε")
+                           .Replace(@"\lambda", "λ")
+                           .Replace(@"\mu", "μ")
+                           .Replace(@"\omega", "ω")
+                           .Replace(@"\Omega", "Ω")
+                           .Replace(@"\Delta", "Δ")
+                           .Replace(@"\theta", "θ")
+                           .Replace(@"\tau", "τ");
+
+            // 3. Superscripts (common powers of 10)
+            output = output.Replace("10^{-4}", "10⁻⁴")
+                           .Replace("10^{-3}", "10⁻³")
+                           .Replace("10^{-2}", "10⁻²")
+                           .Replace("10^{-1}", "10⁻¹")
+                           .Replace("10^0", "10⁰")
+                           .Replace("10^1", "10¹")
+                           .Replace("10^2", "10²")
+                           .Replace("10^3", "10³")
+                           .Replace("10^4", "10⁴");
+
+            // 4. Multiplication symbol
+            output = output.Replace(@"\cdot", "×");
+
+            // 5. Fractions (\frac{a}{b} => a/b)
+            output = Regex.Replace(output, @"\\frac\{([^{}]+)\}\{([^{}]+)\}", "$1/$2");
+
+            // 6. Common physics units (just in case)
+            output = output.Replace("rad", "rad")
+                           .Replace("s", "s")
+                           .Replace("m", "m")
+                           .Replace("kg", "kg")
+                           .Replace("N", "N")
+                           .Replace("J", "J")
+                           .Replace("Hz", "Hz")
+                           .Replace("Pa", "Pa")
+                           .Replace("W", "W")
+                           .Replace("V", "V")
+                           .Replace("A", "A")
+                           .Replace("C", "C");
+
+            return output.Trim();
+        }
+
     }
 }
