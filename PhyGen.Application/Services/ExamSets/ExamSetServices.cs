@@ -5,13 +5,6 @@ using System.Reflection.Metadata;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using iText.Bouncycastleconnector;
-using iText.IO.Font;
-using iText.Kernel.Font;
-using iText.Kernel.Pdf;
-using iText.Layout;
-using iText.Layout.Element;
-using iText.Layout.Properties;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using PhyGen.Application.Abstractions.Authentication;
@@ -25,7 +18,6 @@ using PhyGen.Domain.Classes;
 using PhyGen.Domain.Common;
 using PhyGen.Domain.ExamSets;
 using PhyGen.Domain.Questions;
-using static iText.Kernel.Font.PdfFontFactory;
 
 namespace PhyGen.Application.Services.ExamSets
 {
