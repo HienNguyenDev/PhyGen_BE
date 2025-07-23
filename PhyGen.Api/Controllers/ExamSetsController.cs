@@ -13,6 +13,7 @@ namespace PhyGen.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class ExamSetsController : ControllerBase
     {
         private readonly IExamSetServices _examSetServices;
