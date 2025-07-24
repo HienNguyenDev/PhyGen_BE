@@ -6,19 +6,12 @@ services:
       context: .
       dockerfile: PhyGen.Api/Dockerfile
     ports:
-      - "5152:8080"
-      - "7165:8081"
-    command: ["dotnet", "PhyGen.Api.dll", "--urls=http://0.0.0.0:8080"]
+      - "5152:8080"  
+      - "7165:8081" 
+    volumes:
+      - ./https:/https 
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-
-  # phygen.ocr:
-  #   image: phygenocr
-  #   container_name: PhyGen.OCR
-  #   build:
-  #     context: /home/ec2-user/phygen_api
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "5153:8000"
-  #   environment:
-  #     - PYTHONUNBUFFERED=1
+      - ASPNETCORE_URLS=https://0.0.0.0:8081;http://0.0.0.0:8080
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/dev-cert.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=123456
