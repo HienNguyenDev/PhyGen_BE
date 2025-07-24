@@ -6,12 +6,8 @@ services:
       context: .
       dockerfile: PhyGen.Api/Dockerfile
     ports:
-      - "5152:8080"  
-      - "7165:8081" 
-    volumes:
-      - ./https:/https 
+      - "5152:8080"
+      - "7165:8081"
+    command: ["dotnet", "PhyGen.Api.dll", "--urls=http://0.0.0.0:8080"]
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://0.0.0.0:8081;http://0.0.0.0:8080
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/dev-cert.pfx
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=123456
